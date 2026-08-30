@@ -40,6 +40,35 @@ PORT = int(os.getenv("DASHBOARD_PORT", "8420"))
 # Cache feed entries
 FEED_CACHE_FILE = BASE_DIR / "feed_cache.json"
 
+# Cache storage calculations
+_STORAGE_CACHE = {"timestamp": 0.0, "data": {"raw_mb": 0.0, "trimmed_mb": 0.0, "md_mb": 0.0, "total_mb": 0.0}}
+
+
+def get_cached_storage_stats() -> Dict[str, float]:
+    """Return storage stats with 30s TTL cache to avoid heavy recursive stats on every 3s poll."""
+    now = time.time()
+    if now - _STORAGE_CACHE["timestamp"] < 30.0:
+        return _STORAGE_CACHE["data"]
+
+    def dir_size_mb(path: Path) -> float:
+        if not path.exists():
+            return 0.0
+        return sum(f.stat().st_size for f in path.glob("**/*") if f.is_file()) / (1024 * 1024)
+
+    raw_mb = dir_size_mb(AUDIO_DIR)
+    trimmed_mb = dir_size_mb(TRIMMED_DIR)
+    md_mb = dir_size_mb(PROCESSED_DIR)
+
+    stats = {
+        "raw_mb": round(raw_mb, 1),
+        "trimmed_mb": round(trimmed_mb, 1),
+        "md_mb": round(md_mb, 2),
+        "total_mb": round(raw_mb + trimmed_mb + md_mb, 1),
+    }
+    _STORAGE_CACHE["timestamp"] = now
+    _STORAGE_CACHE["data"] = stats
+    return stats
+
 
 def get_feed_entries() -> List[dict]:
     """Load or cache all episodes from RSS feed."""
@@ -147,7 +176,7 @@ def get_pipeline_status() -> Dict[str, Any]:
             pass
 
     processed_records = list(manifest.values())
-    success_count = sum(1 for r in processed_records if r.get("status") == "SUCCESS")
+    success_count = sum(1 for r in processed_records if r.get("status") in ["SUCCESS", "PARTIAL"])
     failed_count = sum(1 for r in processed_records if r.get("status") == "FAILED")
 
     active_job = detect_current_active_stage()
@@ -155,7 +184,7 @@ def get_pipeline_status() -> Dict[str, Any]:
     # Calculate total preaching hours
     total_preaching_sec = 0.0
     for r in processed_records:
-        if r.get("status") == "SUCCESS":
+        if r.get("status") in ["SUCCESS", "PARTIAL"]:
             start_ts = r.get("preaching_start")
             end_ts = r.get("preaching_end")
             if start_ts and end_ts:
@@ -169,22 +198,14 @@ def get_pipeline_status() -> Dict[str, Any]:
     preach_hours = int(total_preaching_sec // 3600)
     preach_mins = int((total_preaching_sec % 3600) // 60)
 
-    # Disk usage
-    def dir_size_mb(path: Path) -> float:
-        if not path.exists():
-            return 0.0
-        return sum(f.stat().st_size for f in path.glob("**/*") if f.is_file()) / (1024 * 1024)
-
-    raw_mb = dir_size_mb(AUDIO_DIR)
-    trimmed_mb = dir_size_mb(TRIMMED_DIR)
-    md_mb = dir_size_mb(PROCESSED_DIR)
+    storage_stats = get_cached_storage_stats()
 
     # Compile enriched episode queue
     episodes_summary = []
     for item in feed_items:
         guid = item.get("guid")
         rec = manifest.get(guid)
-        status = "COMPLETED" if (rec and rec.get("status") == "SUCCESS") else ("FAILED" if (rec and rec.get("status") == "FAILED") else "QUEUED")
+        status = "COMPLETED" if (rec and rec.get("status") in ["SUCCESS", "PARTIAL"]) else ("FAILED" if (rec and rec.get("status") == "FAILED") else "QUEUED")
         if active_job.get("is_active") and active_job.get("episode_title") and (item.get("title") in active_job.get("episode_title") or item.get("date_iso") in active_job.get("episode_title")):
             status = "IN_PROGRESS"
 
@@ -211,12 +232,7 @@ def get_pipeline_status() -> Dict[str, Any]:
         "percent_complete": round((success_count / total_episodes) * 100, 1) if total_episodes else 0.0,
         "active_job": active_job,
         "total_preaching_time": f"{preach_hours}h {preach_mins}m",
-        "storage": {
-            "raw_mb": round(raw_mb, 1),
-            "trimmed_mb": round(trimmed_mb, 1),
-            "md_mb": round(md_mb, 2),
-            "total_mb": round(raw_mb + trimmed_mb + md_mb, 1),
-        },
+        "storage": storage_stats,
         "drive_synced": DRIVE_LOCAL_PATH.exists(),
         "drive_path": str(DRIVE_LOCAL_PATH),
         "drive_links": {
@@ -808,10 +824,9 @@ class DashboardRequestHandler(http.server.SimpleHTTPRequestHandler):
         elif path == "/api/transcript":
             query = urllib.parse.parse_qs(parsed.query)
             file_name = query.get("file", [""])[0]
-            # Prevent path traversal
             safe_name = os.path.basename(urllib.parse.unquote(file_name))
             md_file = PROCESSED_DIR / safe_name
-            if md_file.exists():
+            if safe_name and md_file.is_file():
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain; charset=utf-8")
                 self.send_header("Access-Control-Allow-Origin", "*")

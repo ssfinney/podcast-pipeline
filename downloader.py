@@ -56,9 +56,7 @@ class Episode:
 
 def sanitize_filename(name: str, max_length: int = 120) -> str:
     """Sanitize title for safe filesystem filenames."""
-    # Replace dangerous characters with hyphens
     clean = re.sub(r'[\\/*?:"<>|]', "-", name)
-    # Collapse multiple spaces or hyphens
     clean = re.sub(r"\s+", " ", clean)
     clean = re.sub(r"-{2,}", "-", clean)
     clean = clean.strip(" .-_")
@@ -122,7 +120,6 @@ def fetch_episodes(feed_url: str = DEFAULT_FEED_URL) -> List[Episode]:
                 media_length = None
             media_type = enc.get("type", "")
 
-        # Fallback to link if no enclosure
         if not media_url:
             media_url = entry.get("link", "")
 
@@ -178,7 +175,6 @@ def download_audio(
             return dest_path, False
         if md_path.exists() and md_path.stat().st_size > 100:
             logger.info(f"Processed MD already exists for episode: {episode.title} -> {md_path.name}")
-            # If MD exists, we might not strictly need audio, but if requested we return dest_path
             if dest_path.exists():
                 return dest_path, False
 
@@ -192,35 +188,40 @@ def download_audio(
     if not ffmpeg_bin:
         raise RuntimeError("ffmpeg binary not found in PATH or static_ffmpeg location.")
 
-    # ffmpeg command: stream over HTTP directly, extract audio, convert to standard MP3
+    # ffmpeg command: stream over HTTP directly with reconnect flags, extract audio, convert to standard MP3
     cmd = [
         ffmpeg_bin,
         "-y",
         "-nostdin",
         "-loglevel",
         "error",
+        "-reconnect",
+        "1",
+        "-reconnect_streamed",
+        "1",
+        "-reconnect_delay_max",
+        "5",
         "-i",
         episode.media_url,
-        "-vn",  # No video
+        "-vn",
         "-acodec",
         "libmp3lame",
         "-ab",
         audio_bitrate,
         "-ar",
-        "24000",  # 24kHz is optimal quality/size for speech
+        "24000",
         "-ac",
-        "1",  # Mono for speech (reduces size 50% with zero quality loss for sermon speech)
+        "1",
         str(tmp_path),
     ]
 
     t0 = time.time()
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    except subprocess.CalledProcessError as e:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=600)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
         if tmp_path.exists():
             tmp_path.unlink()
-        logger.error(f"ffmpeg extraction failed: {e.stderr}")
-        # Fallback to yt-dlp if direct ffmpeg fails
+        logger.error(f"ffmpeg extraction failed or timed out: {e}")
         logger.info("Attempting fallback with yt-dlp...")
         yt_cmd = [
             "yt-dlp",
@@ -233,14 +234,13 @@ def download_audio(
             str(tmp_path),
             episode.media_url,
         ]
-        subprocess.run(yt_cmd, check=True)
+        subprocess.run(yt_cmd, check=True, timeout=600)
 
     if not tmp_path.exists() or tmp_path.stat().st_size < 1024:
         if tmp_path.exists():
             tmp_path.unlink()
         raise RuntimeError(f"Extracted audio file is empty or missing: {tmp_path}")
 
-    # Rename tmp to final destination
     tmp_path.replace(dest_path)
     elapsed = time.time() - t0
     file_size_mb = dest_path.stat().st_size / (1024 * 1024)

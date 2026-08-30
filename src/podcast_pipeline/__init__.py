@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from downloader import Episode, download_audio, fetch_episodes
 from drive_sync import DriveUploader
-from pipeline import PodcastPipeline
+from pipeline import PodcastPipeline, main
 from transcriber import ProsodyTranscriber
 from trimmer import PreachingTrimmer, SermonBoundary
 from validator import PodcastValidator
@@ -19,4 +19,5 @@ __all__ = [
     "DriveUploader",
     "PodcastPipeline",
     "PodcastValidator",
+    "main",
 ]

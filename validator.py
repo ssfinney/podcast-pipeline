@@ -342,5 +342,11 @@ if __name__ == "__main__":
     if args.file:
         rep = validator.validate_episode(Path(args.file))
         print(json.dumps(rep.to_dict(), indent=2))
+        if rep.status == "FAIL":
+            import sys
+            sys.exit(1)
     else:
-        validator.audit_all()
+        reports = validator.audit_all()
+        if any(r.status == "FAIL" for r in reports):
+            import sys
+            sys.exit(1)

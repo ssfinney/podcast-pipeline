@@ -46,9 +46,7 @@ PROSODY_CHUNK_PROMPT = """Transcribe this audio segment verbatim while capturing
 * **Vocal Stress:** Wrap strongly emphasized or punchy words in **bold**.
 * **Pitch & Inflection:** Insert bracketed inline tags for noticeable pitch shifts or tone (e.g., [rising pitch / skeptical], [pitch drop / definitive], [whispering], [laughing]).
 * **Pauses & Cadence:** Annotate deliberate silences or hesitation with duration (e.g., [pause: 1.5s]).
-* **Structure:** Format with speaker labels and timestamps: ### Speaker Name [HH:MM:SS].
-
-Important: This segment starts at timestamp {start_time_str}. Offset all speaker timestamps to reflect the elapsed time in the overall recording."""
+* **Structure:** Format with speaker labels and timestamps: ### Speaker Name [HH:MM:SS]."""
 
 
 def format_timestamp(seconds: float) -> str:
@@ -60,7 +58,7 @@ def format_timestamp(seconds: float) -> str:
 
 
 def adjust_chunk_timestamps(chunk_text: str, start_sec: float) -> str:
-    """Adjust any chunk-relative timestamps [HH:MM:SS] to true absolute timestamps."""
+    """Adjust chunk-relative timestamps [HH:MM:SS] to absolute recording time."""
     if start_sec <= 0:
         return chunk_text
 
@@ -75,12 +73,7 @@ def adjust_chunk_timestamps(chunk_text: str, start_sec: float) -> str:
             else:
                 return match.group(0)
 
-            # If timestamp is already absolute (>= start_sec), keep it
-            if s >= start_sec:
-                abs_s = s
-            else:
-                abs_s = start_sec + s
-
+            abs_s = start_sec + s
             h = int(abs_s // 3600)
             m = int((abs_s % 3600) // 60)
             sec = int(abs_s % 60)
@@ -99,7 +92,7 @@ def get_audio_duration(audio_path: Path) -> float:
         return 0.0
     try:
         cmd = [ffprobe_bin, "-v", "quiet", "-print_format", "json", "-show_format", str(audio_path)]
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30)
         data = json.loads(res.stdout)
         return float(data.get("format", {}).get("duration", 0.0))
     except Exception as e:
@@ -115,7 +108,7 @@ class ProsodyTranscriber:
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
         self.client = genai.Client(api_key=self.api_key)
-        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL")
+        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 
     def _extract_response_text(self, response) -> str:
         """Extract text cleanly from Gemini response object."""
@@ -152,11 +145,11 @@ class ProsodyTranscriber:
             if uploaded_file.state.name != "ACTIVE":
                 raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
 
+            # Build candidate models list: preferred model first, then fallbacks
             models_to_try = []
-            if preferred_model:
-                models_to_try.append(preferred_model)
-            if self.preferred_model and self.preferred_model not in models_to_try:
-                models_to_try.append(self.preferred_model)
+            pref = preferred_model or self.preferred_model
+            if pref:
+                models_to_try.append(pref)
             for m in DEFAULT_MODELS:
                 if m not in models_to_try:
                     models_to_try.append(m)
@@ -213,18 +206,16 @@ class ProsodyTranscriber:
         audio_path: Path,
         cache_dir: Path,
         ffmpeg_bin: str,
-        preferred_model: str,
+        model_name: str,
     ) -> tuple[int, str]:
-        """Worker function to process and transcribe a single chunk."""
+        """Worker function to process and transcribe a single chunk with cleanup."""
         chunk_txt_file = cache_dir / f"chunk_{idx:03d}.txt"
         chunk_audio_file = cache_dir / f"chunk_{idx:03d}.mp3"
 
         if chunk_txt_file.exists() and chunk_txt_file.stat().st_size > 20:
             cached_text = chunk_txt_file.read_text(encoding="utf-8")
-            # Ensure timestamps are normalized
-            adjusted_text = adjust_chunk_timestamps(cached_text, start_sec)
-            logger.info(f"Chunk {idx + 1}/{total_chunks} loaded from cache ({len(adjusted_text)} chars).")
-            return idx, adjusted_text
+            logger.info(f"Chunk {idx + 1}/{total_chunks} loaded from cache ({len(cached_text)} chars).")
+            return idx, cached_text
 
         logger.info(f"Extracting chunk {idx + 1}/{total_chunks} [{format_timestamp(start_sec)} -> {format_timestamp(start_sec + seg_len)}]...")
         cmd = [
@@ -240,19 +231,18 @@ class ProsodyTranscriber:
             "copy",
             str(chunk_audio_file),
         ]
-        subprocess.run(cmd, capture_output=True, check=True)
+        subprocess.run(cmd, capture_output=True, check=True, timeout=60)
 
-        prompt = PROSODY_CHUNK_PROMPT.format(start_time_str=format_timestamp(start_sec))
-        logger.info(f"Transcribing chunk {idx + 1}/{total_chunks}...")
-        raw_chunk_text = self._transcribe_single_file(chunk_audio_file, prompt, preferred_model=preferred_model)
-        adjusted_text = adjust_chunk_timestamps(raw_chunk_text, start_sec)
-
-        chunk_txt_file.write_text(adjusted_text, encoding="utf-8")
-
-        if chunk_audio_file.exists():
-            chunk_audio_file.unlink()
-
-        return idx, adjusted_text
+        try:
+            prompt = PROSODY_CHUNK_PROMPT
+            logger.info(f"Transcribing chunk {idx + 1}/{total_chunks} via {model_name}...")
+            raw_chunk_text = self._transcribe_single_file(chunk_audio_file, prompt, preferred_model=model_name)
+            # Store raw text in chunk file
+            chunk_txt_file.write_text(raw_chunk_text, encoding="utf-8")
+            return idx, raw_chunk_text
+        finally:
+            if chunk_audio_file.exists():
+                chunk_audio_file.unlink()
 
     def transcribe_audio_file(
         self,
@@ -262,7 +252,7 @@ class ProsodyTranscriber:
         max_workers: int = 3,
     ) -> str:
         """
-        Transcribe full audio file using parallel chunks with disk caching and timestamp normalization.
+        Transcribe full audio file using parallel chunks with disk caching and single-pass timestamp normalization.
         """
         if not audio_path.exists() or audio_path.stat().st_size == 0:
             raise FileNotFoundError(f"Audio file not found or empty: {audio_path}")
@@ -290,22 +280,19 @@ class ProsodyTranscriber:
 
         chunk_results: Dict[int, str] = {}
 
-        # First check which chunks are already cached on disk
+        # 1. Check existing cached chunk texts
         for idx in range(num_chunks):
-            start_sec = idx * chunk_duration_sec
             chunk_txt = cache_dir / f"chunk_{idx:03d}.txt"
             if chunk_txt.exists() and chunk_txt.stat().st_size > 20:
-                cached_text = chunk_txt.read_text(encoding="utf-8")
-                chunk_results[idx] = adjust_chunk_timestamps(cached_text, start_sec)
+                chunk_results[idx] = chunk_txt.read_text(encoding="utf-8")
 
-        # Collect chunks that still need processing
+        # 2. Collect chunks needing processing
         needed_chunks = []
         for idx in range(num_chunks):
             if idx not in chunk_results:
                 start_sec = idx * chunk_duration_sec
                 seg_len = min(chunk_duration_sec, duration - start_sec)
-                model = DEFAULT_MODELS[idx % len(DEFAULT_MODELS)]
-                needed_chunks.append((idx, start_sec, seg_len, model))
+                needed_chunks.append((idx, start_sec, seg_len, self.preferred_model))
 
         if needed_chunks:
             logger.info(f"{len(chunk_results)}/{num_chunks} chunks already cached, {len(needed_chunks)} chunks to process.")
@@ -320,7 +307,7 @@ class ProsodyTranscriber:
                         audio_path=audio_path,
                         cache_dir=cache_dir,
                         ffmpeg_bin=ffmpeg_bin,
-                        preferred_model=model,
+                        model_name=model,
                     ): idx
                     for idx, start_sec, seg_len, model in needed_chunks
                 }
@@ -331,8 +318,14 @@ class ProsodyTranscriber:
         else:
             logger.info(f"All {num_chunks} chunks loaded from cache.")
 
-        # Reassemble in exact chronological order
-        full_transcripts = [chunk_results[i] for i in range(num_chunks)]
+        # 3. Assemble and normalize timestamps in a single pass
+        full_transcripts = []
+        for i in range(num_chunks):
+            raw_text = chunk_results.get(i, "")
+            start_sec = i * chunk_duration_sec
+            adjusted_text = adjust_chunk_timestamps(raw_text, start_sec)
+            full_transcripts.append(adjusted_text)
+
         full_transcript = "\n\n".join(full_transcripts)
 
         # Cleanup cache on complete success

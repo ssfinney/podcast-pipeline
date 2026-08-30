@@ -54,7 +54,7 @@ class ProcessingRecord:
     audio_file: str
     audio_size_mb: float
     md_file: str
-    status: str  # "SUCCESS", "FAILED", "SKIPPED"
+    status: str  # "SUCCESS", "FAILED", "PARTIAL", "SKIPPED"
     trimmed_audio_file: Optional[str] = None
     preaching_start: Optional[str] = None
     preaching_end: Optional[str] = None
@@ -100,11 +100,16 @@ class PodcastPipeline:
         return {}
 
     def _save_manifest(self):
+        """Atomically persist manifest.json to prevent corruption on interruption."""
+        tmp_path = MANIFEST_PATH.with_suffix(".tmp.json")
         try:
-            with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
+            with open(tmp_path, "w", encoding="utf-8") as f:
                 json.dump(self.manifest, f, indent=2, ensure_ascii=False)
+            os.replace(tmp_path, MANIFEST_PATH)
             self.export_indexes()
         except Exception as e:
+            if tmp_path.exists():
+                tmp_path.unlink(missing_ok=True)
             logger.warning(f"Could not save manifest: {e}")
 
     def export_indexes(self):
@@ -119,7 +124,8 @@ class PodcastPipeline:
 
         # 1. Export index.csv
         try:
-            with open(INDEX_CSV_PATH, "w", newline="", encoding="utf-8") as f:
+            tmp_csv = INDEX_CSV_PATH.with_suffix(".tmp.csv")
+            with open(tmp_csv, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow([
                     "Index",
@@ -152,6 +158,7 @@ class PodcastPipeline:
                         r.completed_at or "",
                         r.guid,
                     ])
+            os.replace(tmp_csv, INDEX_CSV_PATH)
         except Exception as e:
             logger.warning(f"Failed to export index.csv: {e}")
 
@@ -172,7 +179,7 @@ class PodcastPipeline:
                 speaker = r.speaker_name or "John C. Wood"
                 title_clean = r.title.replace("|", "-")
                 preach_seg = f"`{r.preaching_start or '00:00:00'}` → `{r.preaching_end or 'End'}`"
-                status_badge = "✅ SUCCESS" if r.status == "SUCCESS" else f"❌ {r.status}"
+                status_badge = "✅ SUCCESS" if r.status == "SUCCESS" else f"⚠️ {r.status}"
                 md_link = f"[{r.md_file}](Transcripts/{r.md_file})" if r.md_file else "N/A"
                 audio_link = (
                     f"[{r.trimmed_audio_file}](TrimmedAudio/{r.trimmed_audio_file})"
@@ -183,7 +190,9 @@ class PodcastPipeline:
                 md_lines.append(row)
 
             md_content = "\n".join(md_lines) + "\n"
-            INDEX_MD_PATH.write_text(md_content, encoding="utf-8")
+            tmp_md = INDEX_MD_PATH.with_suffix(".tmp.md")
+            tmp_md.write_text(md_content, encoding="utf-8")
+            os.replace(tmp_md, INDEX_MD_PATH)
         except Exception as e:
             logger.warning(f"Failed to export INDEX.md: {e}")
 
@@ -306,6 +315,7 @@ class PodcastPipeline:
         # Step 3: Sermon Boundary Detection & Preaching Audio Extraction
         boundary: Optional[SermonBoundary] = None
         trimmed_path: Optional[Path] = None
+        trimming_failed = False
         try:
             transcript_text = md_path.read_text(encoding="utf-8")
             total_dur = get_audio_duration(audio_path)
@@ -317,6 +327,7 @@ class PodcastPipeline:
                 force=force,
             )
         except Exception as e:
+            trimming_failed = True
             logger.warning(f"Could not trim preaching audio for '{episode.title}': {e}")
 
         # Step 4: Google Drive Sync (Transcripts & Trimmed Audio)
@@ -339,6 +350,7 @@ class PodcastPipeline:
         )
 
         speaker_final = boundary.speaker_name if (boundary and boundary.speaker_name and boundary.speaker_name != "Preacher") else (episode.author or "John C. Wood")
+        final_status = "PARTIAL" if trimming_failed else "SUCCESS"
 
         record = ProcessingRecord(
             index=episode.index,
@@ -350,7 +362,7 @@ class PodcastPipeline:
             audio_file=audio_path.name,
             audio_size_mb=round(audio_size_mb, 2),
             md_file=md_path.name,
-            status="SUCCESS",
+            status=final_status,
             trimmed_audio_file=trimmed_path.name if trimmed_path else None,
             preaching_start=boundary.start_timestamp if boundary else None,
             preaching_end=boundary.end_timestamp if boundary else None,
@@ -413,7 +425,7 @@ class PodcastPipeline:
             speaker = (r.speaker_name[:12] + "...") if (r.speaker_name and len(r.speaker_name) > 15) else (r.speaker_name or "John C. Wood")
             preach_seg = f"{r.preaching_start or '00:00:00'} → {r.preaching_end or 'End'}"
 
-            if r.status == "SUCCESS":
+            if r.status in ["SUCCESS", "PARTIAL"]:
                 success_count += 1
             else:
                 failed_count += 1
@@ -426,7 +438,8 @@ class PodcastPipeline:
         print("=" * 125 + "\n")
 
 
-if __name__ == "__main__":
+def main():
+    """Main CLI entry point."""
     parser = argparse.ArgumentParser(description="Podcast Download, Transcription, Preaching Trimmer & Sync Pipeline")
     parser.add_argument("--feed", default=DEFAULT_FEED_URL, help="RSS feed URL")
     parser.add_argument("--dry-run", action="store_true", help="Process 1st episode end-to-end as dry run")
@@ -448,3 +461,7 @@ if __name__ == "__main__":
         dry_run=args.dry_run,
         force=args.force,
     )
+
+
+if __name__ == "__main__":
+    main()
