@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 import json
 import logging
@@ -28,6 +29,9 @@ from drive_sync import DriveUploader
 from notebooklm_sync import NotebookLMSync
 from transcriber import ProsodyTranscriber
 from trimmer import DEFAULT_TRIMMED_DIR, PreachingTrimmer, SermonBoundary, get_audio_duration
+
+load_dotenv()
+
 # Logging setup
 logging.basicConfig(
     level=logging.INFO,
@@ -164,7 +168,7 @@ class PodcastPipeline:
 
         # 2. Export INDEX.md
         try:
-            success_count = sum(1 for r in records if r.status == "SUCCESS")
+            success_count = sum(1 for r in records if r.status in ["SUCCESS", "PARTIAL"])
             md_lines = [
                 "# Christ Chapel Podcast Archive Master Index",
                 "",
@@ -223,7 +227,7 @@ class PodcastPipeline:
         existing_record = self.manifest.get(episode.guid)
 
         if not force and md_dest.exists() and md_dest.stat().st_size > 200 and trimmed_dest.exists():
-            if existing_record and existing_record.get("status") == "SUCCESS":
+            if existing_record and existing_record.get("status") in ["SUCCESS", "PARTIAL"]:
                 logger.info(f"Episode already fully processed & trimmed: {md_dest.name}")
                 return ProcessingRecord(**existing_record)
 
@@ -348,6 +352,7 @@ class PodcastPipeline:
             drive_info.get("web_view_link")
             or f"https://drive.google.com/drive/folders/{self.drive_uploader.transcripts_folder_id}"
         )
+
         # Step 5: Direct NotebookLM Ingestion (if authenticated)
         if self.notebooklm_syncer.is_available:
             try:
@@ -388,7 +393,9 @@ class PodcastPipeline:
         dry_run: bool = False,
         force: bool = False,
     ) -> List[ProcessingRecord]:
-        """Run the full batch or dry-run pipeline."""
+        """
+        Run the batch pipeline with concurrent background prefetching of upcoming audio downloads.
+        """
         episodes = fetch_episodes(self.feed_url)
         if not episodes:
             logger.warning("No episodes found in feed.")
@@ -402,12 +409,41 @@ class PodcastPipeline:
         else:
             target_episodes = episodes
 
-        logger.info(f"Targeting {len(target_episodes)} episode(s) for processing.")
+        logger.info(f"Targeting {len(target_episodes)} episode(s) for processing with concurrent prefetch.")
         results: List[ProcessingRecord] = []
 
-        for ep in target_episodes:
-            record = self.process_episode(ep, force=force)
-            results.append(record)
+        def prefetch_worker(next_ep: Episode):
+            """Background worker to prefetch next audio file while current episode transcribes."""
+            try:
+                logger.info(f"⚡ [Prefetch] Downloading next audio in background: [{next_ep.index}] '{next_ep.title}'...")
+                download_audio(
+                    episode=next_ep,
+                    audio_dir=self.audio_dir,
+                    processed_dir=self.processed_dir,
+                    skip_existing=not force,
+                    force=force,
+                )
+            except Exception as err:
+                logger.warning(f"Prefetch download note for '{next_ep.title}': {err}")
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as prefetch_executor:
+            prefetch_future = None
+
+            for idx, ep in enumerate(target_episodes):
+                # Trigger background prefetch for the NEXT episode (idx + 1)
+                if idx + 1 < len(target_episodes):
+                    next_episode = target_episodes[idx + 1]
+                    prefetch_future = prefetch_executor.submit(prefetch_worker, next_episode)
+
+                record = self.process_episode(ep, force=force)
+                results.append(record)
+
+                # Wait for next episode's prefetch to finish before moving to next iteration
+                if prefetch_future:
+                    try:
+                        prefetch_future.result(timeout=600)
+                    except Exception:
+                        pass
 
         self.print_summary_table(results)
         return results
