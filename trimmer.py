@@ -50,7 +50,6 @@ def parse_timestamp_to_seconds(ts: str) -> float:
     """Parse 'HH:MM:SS' or 'MM:SS' into float seconds."""
     if not ts:
         return 0.0
-    # Clean any non-time characters
     ts = re.sub(r"[^\d:]", "", ts.strip())
     parts = ts.split(":")
     try:
@@ -80,12 +79,25 @@ def get_audio_duration(audio_path: Path) -> float:
         return 0.0
     try:
         cmd = [ffprobe_bin, "-v", "quiet", "-print_format", "json", "-show_format", str(audio_path)]
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30)
         data = json.loads(res.stdout)
         return float(data.get("format", {}).get("duration", 0.0))
     except Exception as e:
         logger.warning(f"Could not determine audio duration for {audio_path}: {e}")
         return 0.0
+
+
+def clean_text_for_boundary_detection(text: str) -> str:
+    """Strip prosody markdown tags and extract beginning/end to reduce prompt token bloat."""
+    # Strip bolding **word** -> word
+    clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
+    # Strip acoustic tags [pause: ...], [singing], etc.
+    clean = re.sub(r"\[(pause:[^\]]+|singing|music|rising pitch[^\]]*|pitch drop[^\]]*|whispering|laughing|cheering|applause)\]", "", clean, flags=re.IGNORECASE)
+    clean = re.sub(r"\n{3,}", "\n\n", clean).strip()
+
+    if len(clean) > 30000:
+        clean = clean[:18000] + "\n\n... [MIDDLE TEACHING PORTION] ...\n\n" + clean[-12000:]
+    return clean
 
 
 class PreachingTrimmer:
@@ -106,11 +118,7 @@ class PreachingTrimmer:
         """
         Analyze transcript with Gemini to identify the start and end of the preaching message.
         """
-        # Ensure we send enough transcript to capture both the start transition and the closing prayer
-        sample_text = transcript_text
-        if len(sample_text) > 90000:
-            # Keep beginning (for start transition) and end (for closing transition)
-            sample_text = sample_text[:60000] + "\n\n... [MIDDLE TRANSCRIPT] ...\n\n" + sample_text[-30000:]
+        optimized_transcript = clean_text_for_boundary_detection(transcript_text)
 
         prompt = f"""You are an expert audio editor analyzing a Christian church service / podcast transcript.
 Identify the exact START timestamp and END timestamp where the MAIN PREACHING / SERMON message begins and ends.
@@ -130,7 +138,7 @@ Instructions:
 - Total service length is {format_seconds_to_timestamp(total_duration_sec)}.
 
 Transcript:
-{sample_text}
+{optimized_transcript}
 
 Return strict JSON:
 {{
@@ -207,7 +215,7 @@ Return strict JSON:
         force: bool = False,
     ) -> Path:
         """
-        Extract only the preaching portion of the audio file to MP3 format using ffmpeg.
+        Extract only the preaching portion of the audio file using fast zero-reencode stream copy.
         """
         output_dir.mkdir(parents=True, exist_ok=True)
         stem = raw_audio_path.stem
@@ -230,6 +238,7 @@ Return strict JSON:
 
         tmp_path = dest_path.with_suffix(".tmp.mp3")
 
+        # Use fast stream copy (-c copy) since raw audio is already formatted as 24kHz mono MP3
         cmd = [
             ffmpeg_bin,
             "-y",
@@ -239,20 +248,13 @@ Return strict JSON:
             str(raw_audio_path),
             "-t",
             str(duration_to_cut),
-            "-vn",
-            "-acodec",
-            "libmp3lame",
-            "-ab",
-            "64k",
-            "-ar",
-            "24000",
-            "-ac",
-            "1",
+            "-c",
+            "copy",
             str(tmp_path),
         ]
 
         t0 = time.time()
-        subprocess.run(cmd, capture_output=True, check=True)
+        subprocess.run(cmd, capture_output=True, check=True, timeout=60)
 
         if not tmp_path.exists() or tmp_path.stat().st_size < 1024:
             if tmp_path.exists():
@@ -262,7 +264,7 @@ Return strict JSON:
         tmp_path.replace(dest_path)
         elapsed = time.time() - t0
         size_mb = dest_path.stat().st_size / (1024 * 1024)
-        logger.info(f"Extracted preaching audio: '{dest_path.name}' ({size_mb:.2f} MB) in {elapsed:.1f}s")
+        logger.info(f"Extracted preaching audio: '{dest_path.name}' ({size_mb:.2f} MB) in {elapsed:.2f}s")
 
         # Sync to Google Drive
         if self.drive_uploader.is_available:

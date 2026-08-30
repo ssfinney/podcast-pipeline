@@ -1,4 +1,4 @@
-"""Transcriber module using Google GenAI SDK for prosody-aware audio transcription with parallel chunking & timestamp normalization."""
+"""Transcriber module using Google GenAI SDK for high-throughput prosody-aware audio transcription."""
 
 from __future__ import annotations
 
@@ -131,21 +131,36 @@ class ProsodyTranscriber:
         prompt: str,
         preferred_model: Optional[str] = None,
     ) -> str:
-        """Upload a single audio file/chunk to Gemini and generate transcription."""
+        """
+        Generate prosody transcription for an audio file/chunk.
+        Uses fast inline bytes for small chunks (< 15MB) to eliminate Files API upload/poll/delete latency.
+        """
+        file_size_bytes = file_path.stat().st_size
+        use_inline = file_size_bytes < 15 * 1024 * 1024  # < 15MB inline bytes
+
         uploaded_file = None
+        audio_content_part = None
+
         try:
-            uploaded_file = self.client.files.upload(file=str(file_path))
-            poll_start = time.time()
-            while uploaded_file.state.name == "PROCESSING":
-                if time.time() - poll_start > 180:
-                    raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
-                time.sleep(1.0)
-                uploaded_file = self.client.files.get(name=uploaded_file.name)
+            if use_inline:
+                # Fast in-memory inline bytes (zero Files API polling/deletion overhead)
+                audio_bytes = file_path.read_bytes()
+                audio_content_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/mp3")
+            else:
+                # Files API for larger files
+                uploaded_file = self.client.files.upload(file=str(file_path))
+                poll_start = time.time()
+                while uploaded_file.state.name == "PROCESSING":
+                    if time.time() - poll_start > 180:
+                        raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
+                    time.sleep(1.0)
+                    uploaded_file = self.client.files.get(name=uploaded_file.name)
 
-            if uploaded_file.state.name != "ACTIVE":
-                raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+                if uploaded_file.state.name != "ACTIVE":
+                    raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+                audio_content_part = uploaded_file
 
-            # Build candidate models list: preferred model first, then fallbacks
+            # Build candidate models list
             models_to_try = []
             pref = preferred_model or self.preferred_model
             if pref:
@@ -162,7 +177,7 @@ class ProsodyTranscriber:
                         t0 = time.time()
                         response = self.client.models.generate_content(
                             model=model_name,
-                            contents=[uploaded_file, prompt],
+                            contents=[audio_content_part, prompt],
                             config=types.GenerateContentConfig(temperature=0.2),
                         )
                         text = self._extract_response_text(response)
@@ -237,7 +252,6 @@ class ProsodyTranscriber:
             prompt = PROSODY_CHUNK_PROMPT
             logger.info(f"Transcribing chunk {idx + 1}/{total_chunks} via {model_name}...")
             raw_chunk_text = self._transcribe_single_file(chunk_audio_file, prompt, preferred_model=model_name)
-            # Store raw text in chunk file
             chunk_txt_file.write_text(raw_chunk_text, encoding="utf-8")
             return idx, raw_chunk_text
         finally:
@@ -248,8 +262,8 @@ class ProsodyTranscriber:
         self,
         audio_path: Path,
         episode: Optional[Episode] = None,
-        chunk_duration_sec: int = 300,  # 5 minutes per chunk
-        max_workers: int = 3,
+        chunk_duration_sec: int = 480,  # 8 minutes per chunk for optimal throughput & boundary fidelity
+        max_workers: int = 4,
     ) -> str:
         """
         Transcribe full audio file using parallel chunks with disk caching and single-pass timestamp normalization.
@@ -262,7 +276,7 @@ class ProsodyTranscriber:
         logger.info(f"Audio file: '{audio_path.name}' ({file_size_mb:.2f} MB, {format_timestamp(duration)})")
 
         if duration > 0 and duration <= chunk_duration_sec:
-            logger.info("Audio duration is <= 5 minutes, transcribing in single pass.")
+            logger.info(f"Audio duration is <= {chunk_duration_sec//60} minutes, transcribing in single pass.")
             return self._transcribe_single_file(audio_path, PROSODY_TRANSCRIPTION_PROMPT)
 
         ffmpeg_bin = shutil.which("ffmpeg")
