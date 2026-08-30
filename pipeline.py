@@ -25,11 +25,9 @@ from downloader import (
     fetch_episodes,
 )
 from drive_sync import DriveUploader
+from notebooklm_sync import NotebookLMSync
 from transcriber import ProsodyTranscriber
 from trimmer import DEFAULT_TRIMMED_DIR, PreachingTrimmer, SermonBoundary, get_audio_duration
-
-load_dotenv()
-
 # Logging setup
 logging.basicConfig(
     level=logging.INFO,
@@ -80,6 +78,7 @@ class PodcastPipeline:
         trimmed_dir: Path = DEFAULT_TRIMMED_DIR,
         model_name: Optional[str] = None,
         drive_folder_id: Optional[str] = None,
+        notebook_id: Optional[str] = None,
     ):
         self.feed_url = feed_url
         self.audio_dir = audio_dir
@@ -88,6 +87,7 @@ class PodcastPipeline:
         self.drive_uploader = DriveUploader(folder_id=drive_folder_id)
         self.transcriber = ProsodyTranscriber(preferred_model=model_name)
         self.trimmer = PreachingTrimmer(drive_uploader=self.drive_uploader)
+        self.notebooklm_syncer = NotebookLMSync(notebook_id=notebook_id)
         self.manifest: Dict[str, dict] = self._load_manifest()
 
     def _load_manifest(self) -> Dict[str, dict]:
@@ -348,6 +348,12 @@ class PodcastPipeline:
             drive_info.get("web_view_link")
             or f"https://drive.google.com/drive/folders/{self.drive_uploader.transcripts_folder_id}"
         )
+        # Step 5: Direct NotebookLM Ingestion (if authenticated)
+        if self.notebooklm_syncer.is_available:
+            try:
+                self.notebooklm_syncer.sync_transcript(md_path)
+            except Exception as nlm_err:
+                logger.warning(f"NotebookLM auto-import note for '{episode.title}': {nlm_err}")
 
         speaker_final = boundary.speaker_name if (boundary and boundary.speaker_name and boundary.speaker_name != "Preacher") else (episode.author or "John C. Wood")
         final_status = "PARTIAL" if trimming_failed else "SUCCESS"
@@ -447,6 +453,7 @@ def main():
     parser.add_argument("--force", action="store_true", help="Force re-processing of already completed items")
     parser.add_argument("--model", default=None, help="Preferred Gemini model name")
     parser.add_argument("--drive-folder", default=None, help="Google Drive folder ID")
+    parser.add_argument("--notebook-id", default=None, help="Target NotebookLM notebook ID")
 
     args = parser.parse_args()
 
@@ -454,6 +461,7 @@ def main():
         feed_url=args.feed,
         model_name=args.model,
         drive_folder_id=args.drive_folder,
+        notebook_id=args.notebook_id,
     )
 
     pipeline.run_pipeline(
