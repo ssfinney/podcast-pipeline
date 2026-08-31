@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import subprocess
+import threading
 import time
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -47,6 +48,9 @@ PROSODY_CHUNK_PROMPT = """Transcribe this audio segment verbatim while capturing
 * **Pitch & Inflection:** Insert bracketed inline tags for noticeable pitch shifts or tone (e.g., [rising pitch / skeptical], [pitch drop / definitive], [whispering], [laughing]).
 * **Pauses & Cadence:** Annotate deliberate silences or hesitation with duration (e.g., [pause: 1.5s]).
 * **Structure:** Format with speaker labels and timestamps: ### Speaker Name [HH:MM:SS]."""
+
+# Global lock to serialize audio upload bursts and prevent upstream bandwidth congestion
+_UPLOAD_LOCK = threading.Lock()
 
 
 def format_timestamp(seconds: float) -> str:
@@ -133,7 +137,7 @@ class ProsodyTranscriber:
         max_model_retries: int = 5,
     ) -> str:
         """
-        Generate prosody transcription for an audio file/chunk with fully wrapped upload & generation retries.
+        Generate prosody transcription for an audio file/chunk with serialized upload and parallel inference.
         """
         uploaded_file = None
         models_to_try = []
@@ -149,26 +153,30 @@ class ProsodyTranscriber:
             for model_name in models_to_try:
                 for attempt in range(1, max_model_retries + 1):
                     try:
-                        # Upload via Files API if not already uploaded
+                        # Serialize file uploads to avoid bandwidth congestion
                         if not uploaded_file:
-                            logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB)...")
-                            uploaded_file = self.client.files.upload(file=str(file_path))
-                            poll_start = time.time()
-                            while uploaded_file.state.name == "PROCESSING":
-                                if time.time() - poll_start > 180:
-                                    raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
-                                time.sleep(1.0)
-                                uploaded_file = self.client.files.get(name=uploaded_file.name)
+                            with _UPLOAD_LOCK:
+                                logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB)...")
+                                uploaded_file = self.client.files.upload(file=str(file_path))
+                                poll_start = time.time()
+                                while uploaded_file.state.name == "PROCESSING":
+                                    if time.time() - poll_start > 180:
+                                        raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
+                                    time.sleep(1.0)
+                                    uploaded_file = self.client.files.get(name=uploaded_file.name)
 
-                            if uploaded_file.state.name != "ACTIVE":
-                                raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+                                if uploaded_file.state.name != "ACTIVE":
+                                    raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
 
                         logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (attempt {attempt}/{max_model_retries})...")
                         t0 = time.time()
                         response = self.client.models.generate_content(
                             model=model_name,
                             contents=[uploaded_file, prompt],
-                            config=types.GenerateContentConfig(temperature=0.2),
+                            config=types.GenerateContentConfig(
+                                temperature=0.2,
+                                automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                            ),
                         )
                         text = self._extract_response_text(response)
                         if text:
