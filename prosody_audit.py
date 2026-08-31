@@ -92,7 +92,7 @@ def audit_and_reprocess(
     for episode, audio_path, md_path in eligible:
         fingerprint = _fingerprint(audio_path, md_path)
         previous = state["episodes"].get(episode.guid, {})
-        if previous.get("fingerprint") == fingerprint and previous.get("audit_status") == "AUDITED":
+        if previous.get("fingerprint") == fingerprint and previous.get("audit_status") in {"AUDITED", "REPROCESSED"}:
             logger.info("Audit already complete: %s", md_path.name)
             audit_results.append(previous)
             continue
@@ -157,6 +157,11 @@ def audit_and_reprocess(
             result["reprocess_status"] = record.status
             result["reprocessed_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
             result["reprocess_model"] = pipeline.transcriber.last_model_used
+            if record.status in {"SUCCESS", "PARTIAL"}:
+                result["fingerprint"] = _fingerprint(audio_path, md_path)
+                result["audit_status"] = "REPROCESSED"
+                result["selected_for_reprocess"] = False
+                result["needs_reprocess"] = False
             logger.info("Reprocessed %s: %s", episode.title, record.status)
         except Exception as exc:
             result["reprocess_status"] = "ERROR"
