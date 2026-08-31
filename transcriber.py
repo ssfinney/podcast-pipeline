@@ -27,7 +27,6 @@ static_ffmpeg.add_paths()
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# List models in order of best reliability on current key
 DEFAULT_MODELS = [
     "gemini-3.1-flash-lite",
     "gemini-3.1-flash-lite-preview",
@@ -47,6 +46,8 @@ PROSODY_CHUNK_PROMPT = """Transcribe this audio segment verbatim while capturing
 * **Pitch & Inflection:** Insert bracketed inline tags for noticeable pitch shifts or tone (e.g., [rising pitch / skeptical], [pitch drop / definitive], [whispering], [laughing]).
 * **Pauses & Cadence:** Annotate deliberate silences or hesitation with duration (e.g., [pause: 1.5s]).
 * **Structure:** Format with speaker labels and timestamps: ### Speaker Name [HH:MM:SS]."""
+
+SOCKET_TIMEOUT_SEC = 90.0
 
 
 def format_timestamp(seconds: float) -> str:
@@ -107,7 +108,10 @@ class ProsodyTranscriber:
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
-        self.client = genai.Client(api_key=self.api_key)
+        self.client = genai.Client(
+            api_key=self.api_key,
+            http_options=types.HttpOptions(timeout=SOCKET_TIMEOUT_SEC),
+        )
         self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 
     def _extract_response_text(self, response) -> str:
@@ -143,11 +147,9 @@ class ProsodyTranscriber:
 
         try:
             if use_inline:
-                # Fast in-memory inline bytes (zero Files API polling/deletion overhead)
                 audio_bytes = file_path.read_bytes()
                 audio_content_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/mp3")
             else:
-                # Files API for larger files
                 uploaded_file = self.client.files.upload(file=str(file_path))
                 poll_start = time.time()
                 while uploaded_file.state.name == "PROCESSING":
@@ -160,7 +162,6 @@ class ProsodyTranscriber:
                     raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
                 audio_content_part = uploaded_file
 
-            # Build candidate models list
             models_to_try = []
             pref = preferred_model or self.preferred_model
             if pref:
@@ -178,7 +179,10 @@ class ProsodyTranscriber:
                         response = self.client.models.generate_content(
                             model=model_name,
                             contents=[audio_content_part, prompt],
-                            config=types.GenerateContentConfig(temperature=0.2),
+                            config=types.GenerateContentConfig(
+                                temperature=0.2,
+                                http_options=types.HttpOptions(timeout=SOCKET_TIMEOUT_SEC),
+                            ),
                         )
                         text = self._extract_response_text(response)
                         if text:
@@ -192,9 +196,9 @@ class ProsodyTranscriber:
                         if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
                             logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
                             break
-                        elif "503" in err_str or "UNAVAILABLE" in err_str:
+                        elif "503" in err_str or "UNAVAILABLE" in err_str or "timeout" in err_str.lower():
                             wait_s = attempt * 3
-                            logger.warning(f"[{file_path.stem}] '{model_name}' busy (503). Retrying in {wait_s}s...")
+                            logger.warning(f"[{file_path.stem}] '{model_name}' busy/timeout. Retrying in {wait_s}s...")
                             time.sleep(wait_s)
                         elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
                             wait_s = attempt * 4
@@ -262,11 +266,11 @@ class ProsodyTranscriber:
         self,
         audio_path: Path,
         episode: Optional[Episode] = None,
-        chunk_duration_sec: int = 480,  # 8 minutes per chunk for optimal throughput & boundary fidelity
+        chunk_duration_sec: int = 480,  # 8 minutes per chunk
         max_workers: int = 4,
     ) -> str:
         """
-        Transcribe full audio file using parallel chunks with disk caching and single-pass timestamp normalization.
+        Transcribe full audio file using parallel chunks with disk caching, single-pass timestamp normalization, and worker timeouts.
         """
         if not audio_path.exists() or audio_path.stat().st_size == 0:
             raise FileNotFoundError(f"Audio file not found or empty: {audio_path}")
@@ -276,7 +280,7 @@ class ProsodyTranscriber:
         logger.info(f"Audio file: '{audio_path.name}' ({file_size_mb:.2f} MB, {format_timestamp(duration)})")
 
         if duration > 0 and duration <= chunk_duration_sec:
-            logger.info(f"Audio duration is <= {chunk_duration_sec//60} minutes, transcribing in single pass.")
+            logger.info("Audio duration is <= 8 minutes, transcribing in single pass.")
             return self._transcribe_single_file(audio_path, PROSODY_TRANSCRIPTION_PROMPT)
 
         ffmpeg_bin = shutil.which("ffmpeg")
@@ -327,8 +331,12 @@ class ProsodyTranscriber:
                 }
 
                 for future in concurrent.futures.as_completed(futures):
-                    idx, text = future.result()
-                    chunk_results[idx] = text
+                    try:
+                        idx, text = future.result(timeout=180)
+                        chunk_results[idx] = text
+                    except Exception as e:
+                        logger.warning(f"Chunk transcription error/timeout: {e}")
+                        raise
         else:
             logger.info(f"All {num_chunks} chunks loaded from cache.")
 
