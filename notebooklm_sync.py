@@ -128,6 +128,46 @@ class NotebookLMSync:
             logger.warning(f"Error syncing to NotebookLM: {e}")
             return False
 
+    def replace_transcript(self, md_path: Path) -> bool:
+        """Replace matching NotebookLM sources before uploading a revised transcript."""
+        if not md_path.exists() or not self.is_available:
+            return False
+
+        norm_name = normalize_title(md_path.stem)
+        try:
+            res = subprocess.run(
+                ["notebooklm", "source", "list", "-n", self.notebook_id, "--json"],
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=30,
+            )
+            sources = json.loads(res.stdout).get("sources", [])
+        except Exception as e:
+            logger.warning(f"Could not list NotebookLM sources for replacement: {e}")
+            return False
+
+        matching_ids = [
+            s.get("id")
+            for s in sources
+            if s.get("id") and normalize_title(s.get("title", "")) == norm_name
+        ]
+        for source_id in matching_ids:
+            try:
+                subprocess.run(
+                    ["notebooklm", "source", "delete", source_id, "-y", "-n", self.notebook_id],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                    timeout=30,
+                )
+            except Exception as e:
+                logger.warning(f"Could not delete existing NotebookLM source {source_id}: {e}")
+                return False
+
+        self._existing_sources_cache = None
+        return self.sync_transcript(md_path)
+
     def clean_duplicates(self) -> int:
         """Find and remove duplicate sources in the target notebook."""
         if not self.is_available:

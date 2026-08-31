@@ -53,6 +53,7 @@ ProcessedMD/*.md
 ProcessedMD/*.tmp*
 feed_cache.json
 .tmp_chunks_*
+prosody_audit.json
 
 # macOS / OS artifacts
 .DS_Store

@@ -219,6 +219,7 @@ class PodcastPipeline:
         episode: Episode,
         force: bool = False,
         skip_transcription: bool = False,
+        reprocess_transcript: bool = False,
     ) -> ProcessingRecord:
         """Execute the end-to-end processing pipeline for a single episode."""
         logger.info("=" * 70)
@@ -229,7 +230,7 @@ class PodcastPipeline:
         trimmed_dest = self.trimmed_dir / f"{Path(episode.audio_filename).stem} - Preaching.mp3"
         existing_record = self.manifest.get(episode.guid)
 
-        if not force and md_dest.exists() and md_dest.stat().st_size > 200 and trimmed_dest.exists():
+        if not force and not reprocess_transcript and md_dest.exists() and md_dest.stat().st_size > 200 and trimmed_dest.exists():
             if existing_record and existing_record.get("status") in ["SUCCESS", "PARTIAL"]:
                 logger.info(f"Episode already fully processed & trimmed: {md_dest.name}")
                 return ProcessingRecord(**existing_record)
@@ -284,7 +285,7 @@ class PodcastPipeline:
         t0 = time.time()
         md_path = md_dest
         try:
-            if not md_dest.exists() or md_dest.stat().st_size < 200 or force:
+            if reprocess_transcript or not md_dest.exists() or md_dest.stat().st_size < 200 or force:
                 raw_transcript = self.transcriber.transcribe_audio_file(
                     audio_path=audio_path,
                     episode=episode,
@@ -331,7 +332,7 @@ class PodcastPipeline:
                 raw_audio_path=audio_path,
                 boundary=boundary,
                 output_dir=self.trimmed_dir,
-                force=force,
+                force=force or reprocess_transcript,
             )
         except Exception as e:
             trimming_failed = True
@@ -359,7 +360,10 @@ class PodcastPipeline:
         # Step 5: Direct NotebookLM Ingestion (if authenticated)
         if self.notebooklm_syncer.is_available:
             try:
-                self.notebooklm_syncer.sync_transcript(md_path)
+                if reprocess_transcript:
+                    self.notebooklm_syncer.replace_transcript(md_path)
+                else:
+                    self.notebooklm_syncer.sync_transcript(md_path)
             except Exception as nlm_err:
                 logger.warning(f"NotebookLM auto-import note for '{episode.title}': {nlm_err}")
 

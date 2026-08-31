@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from downloader import sanitize_filename, parse_pub_date, Episode
 from trimmer import parse_timestamp_to_seconds, format_seconds_to_timestamp
-from transcriber import adjust_chunk_timestamps
+from transcriber import ProsodyTranscriber, adjust_chunk_timestamps
 from validator import detect_repetition_loops, PodcastValidator
 
 
@@ -80,5 +80,22 @@ def test_transcript_validation_flow(tmp_path):
     assert reports[0].status in ["PASS", "WARN"]
 
 
+
+def test_audit_transcript_parses_json_and_records_model(monkeypatch, tmp_path):
+    transcriber = ProsodyTranscriber.__new__(ProsodyTranscriber)
+    transcriber.last_model_used = "gemini-3.7-flash"
+
+    def fake_transcribe(audio_path, prompt, preferred_model, max_model_retries):
+        assert preferred_model == "gemini-3.7-flash"
+        return "```json\n{\"needs_reprocess\": true, \"confidence\": 0.9, \"issues\": [\"omission\"]}\n```"
+
+    monkeypatch.setattr(transcriber, "_transcribe_single_file", fake_transcribe)
+    audio_path = tmp_path / "episode.mp3"
+    result = transcriber.audit_transcript(audio_path, "existing transcript")
+
+    assert result["needs_reprocess"] is True
+    assert result["confidence"] == 0.9
+    assert result["recommendation"] == "reprocess"
+    assert result["model_used"] == "gemini-3.7-flash"
 if __name__ == "__main__":
     pytest.main(["-v", __file__])

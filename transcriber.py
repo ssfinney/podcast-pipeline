@@ -116,6 +116,7 @@ class ProsodyTranscriber:
             raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
         self.client = genai.Client(api_key=self.api_key)
         self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
+        self.last_model_used: Optional[str] = None
 
     def _extract_response_text(self, response) -> str:
         """Extract text cleanly from Gemini response object."""
@@ -185,6 +186,7 @@ class ProsodyTranscriber:
                         )
                         text = self._extract_response_text(response)
                         if text:
+                            self.last_model_used = model_name
                             elapsed = time.time() - t0
                             logger.info(f"[{file_path.stem}] Success with '{model_name}' ({len(text)} chars in {elapsed:.1f}s).")
                             return text
@@ -217,6 +219,59 @@ class ProsodyTranscriber:
                     self.client.files.delete(name=uploaded_file.name)
                 except Exception as del_err:
                     logger.warning(f"Failed to delete remote file {uploaded_file.name}: {del_err}")
+
+    def audit_transcript(self, audio_path: Path, existing_transcript: str) -> dict:
+        """Have Gemini 3.7 Flash assess an existing transcript against its source audio."""
+        prompt = f"""Audit the existing podcast transcript against the attached source audio.
+Use Gemini 3.7 Flash for this audit. Do not rewrite the transcript.
+
+Return one JSON object only:
+{{
+  "needs_reprocess": true or false,
+  "confidence": 0.0 to 1.0,
+  "score": 0 to 100,
+  "issues": ["specific substantive fidelity, omission, timestamp, or prosody issues"],
+  "reason": "brief evidence-based explanation",
+  "recommendation": "reprocess" or "keep"
+}}
+
+Set needs_reprocess=true only for a material problem that a fresh transcription could fix:
+- substantial words or passages missing, invented, or materially misheard;
+- timestamps/speaker segmentation are materially wrong;
+- prosody annotations are absent or unusable across substantial portions;
+- repetition/hallucination or truncation makes the transcript unreliable.
+
+Do not request reprocessing for minor punctuation, harmless wording variation, or subjective style preferences.
+If uncertain, set needs_reprocess=false and explain why.
+
+Existing transcript:
+{existing_transcript}
+"""
+        raw = self._transcribe_single_file(
+            audio_path,
+            prompt,
+            preferred_model="gemini-3.7-flash",
+            max_model_retries=3,
+        ).strip()
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.DOTALL).strip()
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            start, end = raw.find("{"), raw.rfind("}")
+            if start < 0 or end <= start:
+                raise ValueError(f"Gemini audit did not return JSON: {raw[:200]}")
+            data = json.loads(raw[start : end + 1])
+
+        if not isinstance(data, dict):
+            raise ValueError("Gemini audit response was not a JSON object.")
+        data["needs_reprocess"] = bool(data.get("needs_reprocess", False))
+        data["confidence"] = float(data.get("confidence", 0.0))
+        data["score"] = float(data.get("score", 0.0))
+        data["issues"] = data.get("issues", [])
+        data["reason"] = str(data.get("reason", ""))
+        data["recommendation"] = "reprocess" if data["needs_reprocess"] else "keep"
+        data["model_used"] = self.last_model_used
+        return data
 
     def _process_chunk_worker(
         self,
