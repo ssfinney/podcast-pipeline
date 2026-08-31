@@ -28,12 +28,15 @@ static_ffmpeg.add_paths()
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# List models in order of best reliability on current key
+# Model preference order: favor the available 3.7 Flash model, then stable
+# Flash fallbacks before the lower-cost lite models and Pro preview.
 DEFAULT_MODELS = [
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash",
+    "gemini-3-flash-preview",
     "gemini-3.1-flash-lite",
     "gemini-3.1-flash-lite-preview",
-    "gemini-3.5-flash",
-    "gemini-3.6-flash",
     "gemini-3.1-pro-preview",
 ]
 
@@ -112,7 +115,7 @@ class ProsodyTranscriber:
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
         self.client = genai.Client(api_key=self.api_key)
-        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
 
     def _extract_response_text(self, response) -> str:
         """Extract text cleanly from Gemini response object."""

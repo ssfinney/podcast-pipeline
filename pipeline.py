@@ -90,7 +90,7 @@ class PodcastPipeline:
         self.trimmed_dir = trimmed_dir
         self.drive_uploader = DriveUploader(folder_id=drive_folder_id)
         self.transcriber = ProsodyTranscriber(preferred_model=model_name)
-        self.trimmer = PreachingTrimmer(drive_uploader=self.drive_uploader)
+        self.trimmer = PreachingTrimmer()
         self.notebooklm_syncer = NotebookLMSync(notebook_id=notebook_id)
         self.manifest: Dict[str, dict] = self._load_manifest()
 
@@ -118,7 +118,7 @@ class PodcastPipeline:
 
     def export_indexes(self):
         """Export master INDEX.md and index.csv, and sync to Google Drive."""
-        valid_fields = {f for f in ProcessingRecord.__dataclass_fields__}
+        valid_fields = set(ProcessingRecord.__dataclass_fields__)
         records = sorted(
             [
                 ProcessingRecord(**{k: v for k, v in data.items() if k in valid_fields})
@@ -127,6 +127,11 @@ class PodcastPipeline:
             key=lambda r: (r.date_iso, r.index),
             reverse=True,
         )
+        if not records:
+            return
+
+        # 1. Export index.csv
+        try:
             tmp_csv = INDEX_CSV_PATH.with_suffix(".tmp.csv")
             with open(tmp_csv, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
@@ -209,7 +214,6 @@ class PodcastPipeline:
                 logger.info("Synced INDEX.md and index.csv to Google Drive root folder.")
             except Exception as e:
                 logger.warning(f"Failed copying index files to Drive: {e}")
-
     def process_episode(
         self,
         episode: Episode,
