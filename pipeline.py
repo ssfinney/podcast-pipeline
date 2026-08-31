@@ -118,16 +118,15 @@ class PodcastPipeline:
 
     def export_indexes(self):
         """Export master INDEX.md and index.csv, and sync to Google Drive."""
+        valid_fields = {f for f in ProcessingRecord.__dataclass_fields__}
         records = sorted(
-            [ProcessingRecord(**data) for data in self.manifest.values()],
+            [
+                ProcessingRecord(**{k: v for k, v in data.items() if k in valid_fields})
+                for data in self.manifest.values()
+            ],
             key=lambda r: (r.date_iso, r.index),
             reverse=True,
         )
-        if not records:
-            return
-
-        # 1. Export index.csv
-        try:
             tmp_csv = INDEX_CSV_PATH.with_suffix(".tmp.csv")
             with open(tmp_csv, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)

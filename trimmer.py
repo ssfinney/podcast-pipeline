@@ -18,8 +18,6 @@ from google import genai
 from google.genai import types
 import static_ffmpeg
 
-from drive_sync import DriveUploader
-
 # Initialize static ffmpeg
 static_ffmpeg.add_paths()
 
@@ -88,27 +86,33 @@ def get_audio_duration(audio_path: Path) -> float:
 
 
 def clean_text_for_boundary_detection(text: str) -> str:
-    """Strip prosody markdown tags and extract beginning/end to reduce prompt token bloat."""
-    # Strip bolding **word** -> word
+    """
+    Strip heavy prosody markdown and retain beginning (up to 55m in) and conclusion
+    to guarantee the preacher transition is captured.
+    """
     clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
-    # Strip acoustic tags [pause: ...], [singing], etc.
-    clean = re.sub(r"\[(pause:[^\]]+|singing|music|rising pitch[^\]]*|pitch drop[^\]]*|whispering|laughing|cheering|applause)\]", "", clean, flags=re.IGNORECASE)
+    clean = re.sub(
+        r"\[(pause:[^\]]+|singing|music|rising pitch[^\]]*|pitch drop[^\]]*|whispering|laughing|cheering|applause)\]",
+        "",
+        clean,
+        flags=re.IGNORECASE,
+    )
     clean = re.sub(r"\n{3,}", "\n\n", clean).strip()
 
-    if len(clean) > 30000:
-        clean = clean[:18000] + "\n\n... [MIDDLE TEACHING PORTION] ...\n\n" + clean[-12000:]
+    # Church service sermons frequently start 35-50 minutes in; retain first 45k chars and last 20k chars
+    if len(clean) > 65000:
+        clean = clean[:45000] + "\n\n... [MIDDLE TEACHING PORTION] ...\n\n" + clean[-20000:]
     return clean
 
 
 class PreachingTrimmer:
     """Detects preaching boundaries and extracts sermon-only audio files."""
 
-    def __init__(self, api_key: Optional[str] = None, drive_uploader: Optional[DriveUploader] = None):
+    def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is not set.")
         self.client = genai.Client(api_key=self.api_key)
-        self.drive_uploader = drive_uploader or DriveUploader()
 
     def detect_boundaries_from_transcript(
         self,
@@ -160,9 +164,12 @@ Return strict JSON:
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
                         temperature=0.1,
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
                     ),
                 )
                 raw_json = resp.text.strip()
+                # Clean any markdown code fences
+                raw_json = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_json, flags=re.DOTALL).strip()
                 data = json.loads(raw_json)
 
                 start_ts = data.get("preaching_start_timestamp", "00:00:00")
@@ -238,7 +245,6 @@ Return strict JSON:
 
         tmp_path = dest_path.with_suffix(".tmp.mp3")
 
-        # Use fast stream copy (-c copy) since raw audio is already formatted as 24kHz mono MP3
         cmd = [
             ffmpeg_bin,
             "-y",
@@ -265,15 +271,6 @@ Return strict JSON:
         elapsed = time.time() - t0
         size_mb = dest_path.stat().st_size / (1024 * 1024)
         logger.info(f"Extracted preaching audio: '{dest_path.name}' ({size_mb:.2f} MB) in {elapsed:.2f}s")
-
-        # Sync to Google Drive
-        if self.drive_uploader.is_available:
-            self.drive_uploader.upload_audio(
-                file_path=dest_path,
-                title=f"{stem} - Preaching",
-                description=f"Preaching segment ({boundary.start_timestamp} - {boundary.end_timestamp}) by {boundary.speaker_name}",
-            )
-
         return dest_path
 
 

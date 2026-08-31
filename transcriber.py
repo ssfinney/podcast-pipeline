@@ -158,15 +158,17 @@ class ProsodyTranscriber:
                             with _UPLOAD_LOCK:
                                 logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB)...")
                                 uploaded_file = self.client.files.upload(file=str(file_path))
-                                poll_start = time.time()
-                                while uploaded_file.state.name == "PROCESSING":
-                                    if time.time() - poll_start > 180:
-                                        raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
-                                    time.sleep(1.0)
-                                    uploaded_file = self.client.files.get(name=uploaded_file.name)
 
-                                if uploaded_file.state.name != "ACTIVE":
-                                    raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+                            # Polling is executed outside the upload lock so other workers are not blocked!
+                            poll_start = time.time()
+                            while uploaded_file.state.name == "PROCESSING":
+                                if time.time() - poll_start > 180:
+                                    raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
+                                time.sleep(1.0)
+                                uploaded_file = self.client.files.get(name=uploaded_file.name)
+
+                            if uploaded_file.state.name != "ACTIVE":
+                                raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
 
                         logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (attempt {attempt}/{max_model_retries})...")
                         t0 = time.time()

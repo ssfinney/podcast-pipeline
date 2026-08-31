@@ -80,7 +80,6 @@ class DriveUploader:
         except Exception:
             pass
 
-        # Check local Google Drive CloudStorage sync directory
         if self.local_drive_path and self.local_drive_path.parent.exists():
             (self.local_drive_path / "Transcripts").mkdir(parents=True, exist_ok=True)
             (self.local_drive_path / "TrimmedAudio").mkdir(parents=True, exist_ok=True)
@@ -88,7 +87,7 @@ class DriveUploader:
 
     @property
     def is_available(self) -> bool:
-        return self._api_authenticated or (self.local_drive_path and self.local_drive_path.exists())
+        return (self.local_drive_path and self.local_drive_path.exists()) or (self._api_authenticated and self.service is not None)
 
     def upload_file(
         self,
@@ -99,7 +98,7 @@ class DriveUploader:
     ) -> Optional[dict]:
         """
         Upload/sync file to Google Drive.
-        Uses local Google Drive desktop sync directly and/or REST API.
+        Prefers direct local desktop sync if available; falls back to REST API to avoid duplicate uploads.
         """
         if not file_path.exists():
             return None
@@ -112,7 +111,7 @@ class DriveUploader:
             "web_view_link": None,
         }
 
-        # 1. Sync to local Google Drive folder if available
+        # 1. Prefer local Google Drive folder if available (instant, zero duplicate API calls)
         if self.local_drive_path and self.local_drive_path.exists():
             dest_dir = self.local_drive_path / subfolder
             dest_dir.mkdir(parents=True, exist_ok=True)
@@ -121,13 +120,12 @@ class DriveUploader:
                 shutil.copy2(file_path, dest_file)
                 logger.info(f"Synced to Google Drive ({subfolder}): {dest_file.name}")
                 result["local_drive_dest"] = str(dest_file)
-                result["web_view_link"] = (
-                    f"https://drive.google.com/drive/folders/{result['folder_id']}"
-                )
+                result["web_view_link"] = f"https://drive.google.com/drive/folders/{result['folder_id']}"
+                return result
             except Exception as e:
                 logger.warning(f"Error copying to local Google Drive: {e}")
 
-        # 2. Upload via Drive REST API if authenticated
+        # 2. Upload via Drive REST API only if local sync is not available
         if self._api_authenticated and self.service:
             try:
                 from googleapiclient.http import MediaFileUpload
@@ -150,6 +148,7 @@ class DriveUploader:
                 result["file_id"] = uploaded.get("id")
                 result["web_view_link"] = uploaded.get("webViewLink")
                 logger.info(f"Uploaded via Drive API: ID={result['file_id']}")
+                return result
             except Exception as e:
                 logger.warning(f"API upload failed: {e}")
 
