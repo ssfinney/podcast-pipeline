@@ -24,7 +24,7 @@ def test_timestamp_conversions():
 
 def test_adjust_chunk_timestamps():
     chunk_text = "### Speaker [00:03:14] Welcome to church."
-    adjusted = adjust_chunk_timestamps(chunk_text, start_sec=1800) # 30 mins offset
+    adjusted = adjust_chunk_timestamps(chunk_text, start_sec=1800)  # 30 mins offset
     assert "[00:33:14]" in adjusted
 
 
@@ -32,20 +32,52 @@ def test_repetition_detector():
     normal_text = "God is good all the time and all the time God is good."
     assert detect_repetition_loops(normal_text) is None
 
-    loop_text = "and he said and he said and he said and he said and he said and he said and he said and he said and he said and he said."
+    loop_text = (
+        "and he said and he said and he said and he said and he said and he said and he said and he said."
+    )
     assert detect_repetition_loops(loop_text) is not None
 
 
-def test_processed_transcripts_exist():
-    md_files = list(Path("ProcessedMD").glob("*.md"))
-    assert len(md_files) >= 3
+def test_transcript_validation_flow(tmp_path):
+    # Test validator with a realistic sample transcript fixture
+    processed_dir = tmp_path / "ProcessedMD"
+    processed_dir.mkdir()
+    sample_md = processed_dir / "2026-08-30 - Test Sermon.md"
 
+    body_lines = [
+        "---",
+        'title: "Test Sermon"',
+        'date: "2026-08-30"',
+        'author: "John C. Wood"',
+        'duration: "1:30:00"',
+        "---",
+        "",
+        "# Test Sermon",
+        "",
+        "## Summary",
+        "A sample test sermon summary.",
+        "",
+        "---",
+        "",
+        "## Verbatim Prosody Transcript",
+        "",
+        "### Speaker [00:00:00]",
+        "Good **morning** church family! [pause: 1.0s] [cheering]",
+        "We are so **grateful** to be here today. [rising pitch]",
+        "The **Lord** is our **shepherd** and we shall not **want**.",
+        "He **leadeth** me in paths of **righteousness** for his name sake. [pause: 0.5s]",
+        "Yea, though I **walk** through the valley of the shadow of death, [pause: 1.0s]",
+        "I will **fear** no **evil**, for thou art with me. [whispering]",
+        "Thy rod and thy staff they **comfort** me. [pitch drop]",
+        "Surely **goodness** and **mercy** shall follow me all the days of my life. [applause]",
+    ]
 
-def test_validator_run():
-    validator = PodcastValidator()
+    sample_md.write_text("\n".join(body_lines), encoding="utf-8")
+
+    validator = PodcastValidator(processed_dir=processed_dir, audio_dir=tmp_path, trimmed_dir=tmp_path)
     reports = validator.audit_all(output_json=False)
-    assert len(reports) >= 3
-    assert all(r.status in ["PASS", "WARN"] for r in reports)
+    assert len(reports) == 1
+    assert reports[0].status in ["PASS", "WARN"]
 
 
 if __name__ == "__main__":

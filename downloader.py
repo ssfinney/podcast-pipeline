@@ -1,8 +1,9 @@
-"""Downloader module for podcast RSS feeds with direct audio extraction."""
+"""Downloader module for podcast RSS feeds with direct audio extraction and resilient feed parsing."""
 
 from __future__ import annotations
 
 import datetime
+import json
 import logging
 import os
 import re
@@ -31,6 +32,7 @@ static_ffmpeg.add_paths()
 DEFAULT_FEED_URL = "https://s3.amazonaws.com/ccstarchives/xml/videopodcast.xml"
 DEFAULT_AUDIO_DIR = Path(__file__).parent / "RawAudio"
 DEFAULT_PROCESSED_DIR = Path(__file__).parent / "ProcessedMD"
+FEED_CACHE_PATH = Path(__file__).parent / "feed_cache.json"
 
 
 @dataclass
@@ -88,12 +90,35 @@ def parse_pub_date(entry: feedparser.FeedParserDict) -> tuple[str, str]:
     return date_iso, pub_raw
 
 
-def fetch_episodes(feed_url: str = DEFAULT_FEED_URL) -> List[Episode]:
-    """Fetch and parse all episodes from the given RSS feed URL."""
-    logger.info(f"Fetching RSS feed from: {feed_url}")
-    feed = feedparser.parse(feed_url)
-    if feed.bozo and not feed.entries:
-        raise ValueError(f"Failed to parse RSS feed from {feed_url}: {feed.bozo_exception}")
+def fetch_episodes(feed_url: str = DEFAULT_FEED_URL, max_retries: int = 4) -> List[Episode]:
+    """Fetch and parse all episodes from the given RSS feed URL with retries and local caching."""
+    feed = None
+    last_err = None
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            logger.info(f"Fetching RSS feed from: {feed_url} (attempt {attempt}/{max_retries})")
+            feed = feedparser.parse(feed_url)
+            if feed and feed.entries:
+                break
+            if feed and feed.bozo and not feed.entries:
+                raise ValueError(f"Feed error: {feed.bozo_exception}")
+        except Exception as e:
+            last_err = e
+            logger.warning(f"Feed fetch attempt {attempt} failed ({e}). Retrying in {attempt * 2}s...")
+            time.sleep(attempt * 2)
+
+    # Fallback to local cache if network dropped
+    if not feed or not feed.entries:
+        if FEED_CACHE_PATH.exists():
+            logger.warning(f"Using local feed cache due to network error: {last_err}")
+            try:
+                with open(FEED_CACHE_PATH, "r", encoding="utf-8") as f:
+                    cached_data = json.load(f)
+                    return [Episode(**d) for d in cached_data]
+            except Exception:
+                pass
+        raise ValueError(f"Failed to parse RSS feed from {feed_url} after {max_retries} attempts: {last_err}")
 
     episodes: List[Episode] = []
     for idx, entry in enumerate(feed.entries):
@@ -147,6 +172,14 @@ def fetch_episodes(feed_url: str = DEFAULT_FEED_URL) -> List[Episode]:
         )
 
     logger.info(f"Parsed {len(episodes)} episodes from feed.")
+
+    # Save to local feed cache
+    try:
+        with open(FEED_CACHE_PATH, "w", encoding="utf-8") as f:
+            json.dump([e.to_dict() for e in episodes], f)
+    except Exception:
+        pass
+
     return episodes
 
 

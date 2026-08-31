@@ -1,8 +1,8 @@
 # Christ Chapel Podcast Archive Master Index
 
-- **Total Cataloged Episodes:** 4
-- **Successfully Processed & Trimmed:** 4
-- **Last Updated:** 2026-08-30 18:25:41
+- **Total Cataloged Episodes:** 9
+- **Successfully Processed & Trimmed:** 9
+- **Last Updated:** 2026-08-30 19:51:59
 
 | # | Date | Sermon Title | Primary Speaker | Service Length | Preaching Segment | Status | Transcript | Preaching Audio |
 |---|---|---|---|---|---|---|---|---|
@@ -10,3 +10,8 @@
 | 2 | **2026-08-23** | It Is the Love of God That Is Hindering You | John C. Wood | 1:30:00 | `00:40:00` → `01:20:00` | ✅ SUCCESS | [2026-08-23 - It Is the Love of God That Is Hindering You.md](Transcripts/2026-08-23 - It Is the Love of God That Is Hindering You.md) | [2026-08-23 - It Is the Love of God That Is Hindering You - Preaching.mp3](TrimmedAudio/2026-08-23 - It Is the Love of God That Is Hindering You - Preaching.mp3) |
 | 3 | **2026-08-16** | I Am Christ Chapel - Katie Peck | Katie Peck | 1:30:00 | `00:35:00` → `01:20:00` | ✅ SUCCESS | [2026-08-16 - I Am Christ Chapel - Katie Peck.md](Transcripts/2026-08-16 - I Am Christ Chapel - Katie Peck.md) | [2026-08-16 - I Am Christ Chapel - Katie Peck - Preaching.mp3](TrimmedAudio/2026-08-16 - I Am Christ Chapel - Katie Peck - Preaching.mp3) |
 | 4 | **2026-08-09** | The Healing Properties of Psalm 23 (Part 4): Refreshment and Restoration | John C. Wood | 1:30:00 | `00:34:30` → `01:14:30` | ✅ SUCCESS | [2026-08-09 - The Healing Properties of Psalm 23 (Part 4)- Refreshment and Restoration.md](Transcripts/2026-08-09 - The Healing Properties of Psalm 23 (Part 4)- Refreshment and Restoration.md) | [2026-08-09 - The Healing Properties of Psalm 23 (Part 4)- Refreshment and Restoration - Preaching.mp3](TrimmedAudio/2026-08-09 - The Healing Properties of Psalm 23 (Part 4)- Refreshment and Restoration - Preaching.mp3) |
+| 5 | **2026-08-02** | The Healing Properties of Psalm 23 (Part 3): Submission and Rest | John C. Wood | 1:30:00 | `00:42:28` → `01:14:35` | ✅ SUCCESS | [2026-08-02 - The Healing Properties of Psalm 23 (Part 3)- Submission and Rest.md](Transcripts/2026-08-02 - The Healing Properties of Psalm 23 (Part 3)- Submission and Rest.md) | [2026-08-02 - The Healing Properties of Psalm 23 (Part 3)- Submission and Rest - Preaching.mp3](TrimmedAudio/2026-08-02 - The Healing Properties of Psalm 23 (Part 3)- Submission and Rest - Preaching.mp3) |
+| 6 | **2026-07-26** | Wrestle to Win | Jason Braddock | 1:30:00 | `00:40:25` → `01:22:35` | ✅ SUCCESS | [2026-07-26 - Wrestle to Win.md](Transcripts/2026-07-26 - Wrestle to Win.md) | [2026-07-26 - Wrestle to Win - Preaching.mp3](TrimmedAudio/2026-07-26 - Wrestle to Win - Preaching.mp3) |
+| 7 | **2026-07-19** | The Healing Properties of Psalm 23 (Part 2): Provision | John C. Wood | 1:30:00 | `00:26:38` → `01:06:33` | ✅ SUCCESS | [2026-07-19 - The Healing Properties of Psalm 23 (Part 2)- Provision.md](Transcripts/2026-07-19 - The Healing Properties of Psalm 23 (Part 2)- Provision.md) | [2026-07-19 - The Healing Properties of Psalm 23 (Part 2)- Provision - Preaching.mp3](TrimmedAudio/2026-07-19 - The Healing Properties of Psalm 23 (Part 2)- Provision - Preaching.mp3) |
+| 8 | **2026-07-12** | The Healing Properties of Psalm 23 (Part 1): Identification | John C. Wood | 1:30:00 | `00:32:00` → `01:20:23` | ✅ SUCCESS | [2026-07-12 - The Healing Properties of Psalm 23 (Part 1)- Identification.md](Transcripts/2026-07-12 - The Healing Properties of Psalm 23 (Part 1)- Identification.md) | [2026-07-12 - The Healing Properties of Psalm 23 (Part 1)- Identification - Preaching.mp3](TrimmedAudio/2026-07-12 - The Healing Properties of Psalm 23 (Part 1)- Identification - Preaching.mp3) |
+| 9 | **2026-07-05** | The Victory that Overcometh the World | John C. Wood | 1:30:00 | `00:35:45` → `01:29:24` | ✅ SUCCESS | [2026-07-05 - The Victory that Overcometh the World.md](Transcripts/2026-07-05 - The Victory that Overcometh the World.md) | [2026-07-05 - The Victory that Overcometh the World - Preaching.mp3](TrimmedAudio/2026-07-05 - The Victory that Overcometh the World - Preaching.mp3) |

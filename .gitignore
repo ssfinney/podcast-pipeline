@@ -48,7 +48,9 @@ TrimmedAudio/*.tmp*
 *.tmp.*
 .chunk_cache_*
 
-# Cache & Runtime
+# Generated Transcripts & Local Cache
+ProcessedMD/*.md
+ProcessedMD/*.tmp*
 feed_cache.json
 .tmp_chunks_*
 

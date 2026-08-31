@@ -1,4 +1,4 @@
-"""Transcriber module using Google GenAI SDK for high-throughput prosody-aware audio transcription."""
+"""Transcriber module using Google GenAI SDK for high-throughput, resilient prosody-aware audio transcription."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import subprocess
+import threading
 import time
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -47,6 +48,9 @@ PROSODY_CHUNK_PROMPT = """Transcribe this audio segment verbatim while capturing
 * **Pitch & Inflection:** Insert bracketed inline tags for noticeable pitch shifts or tone (e.g., [rising pitch / skeptical], [pitch drop / definitive], [whispering], [laughing]).
 * **Pauses & Cadence:** Annotate deliberate silences or hesitation with duration (e.g., [pause: 1.5s]).
 * **Structure:** Format with speaker labels and timestamps: ### Speaker Name [HH:MM:SS]."""
+
+# Global lock to serialize audio upload bursts and prevent upstream bandwidth congestion
+_UPLOAD_LOCK = threading.Lock()
 
 
 def format_timestamp(seconds: float) -> str:
@@ -130,55 +134,49 @@ class ProsodyTranscriber:
         file_path: Path,
         prompt: str,
         preferred_model: Optional[str] = None,
+        max_model_retries: int = 5,
     ) -> str:
         """
-        Generate prosody transcription for an audio file/chunk.
-        Uses fast inline bytes for small chunks (< 15MB) to eliminate Files API upload/poll/delete latency.
+        Generate prosody transcription for an audio file/chunk with serialized upload and parallel inference.
         """
-        file_size_bytes = file_path.stat().st_size
-        use_inline = file_size_bytes < 15 * 1024 * 1024  # < 15MB inline bytes
-
         uploaded_file = None
-        audio_content_part = None
+        models_to_try = []
+        pref = preferred_model or self.preferred_model
+        if pref:
+            models_to_try.append(pref)
+        for m in DEFAULT_MODELS:
+            if m not in models_to_try:
+                models_to_try.append(m)
 
+        last_error = None
         try:
-            if use_inline:
-                # Fast in-memory inline bytes (zero Files API polling/deletion overhead)
-                audio_bytes = file_path.read_bytes()
-                audio_content_part = types.Part.from_bytes(data=audio_bytes, mime_type="audio/mp3")
-            else:
-                # Files API for larger files
-                uploaded_file = self.client.files.upload(file=str(file_path))
-                poll_start = time.time()
-                while uploaded_file.state.name == "PROCESSING":
-                    if time.time() - poll_start > 180:
-                        raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
-                    time.sleep(1.0)
-                    uploaded_file = self.client.files.get(name=uploaded_file.name)
-
-                if uploaded_file.state.name != "ACTIVE":
-                    raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
-                audio_content_part = uploaded_file
-
-            # Build candidate models list
-            models_to_try = []
-            pref = preferred_model or self.preferred_model
-            if pref:
-                models_to_try.append(pref)
-            for m in DEFAULT_MODELS:
-                if m not in models_to_try:
-                    models_to_try.append(m)
-
-            last_error = None
             for model_name in models_to_try:
-                for attempt in range(1, 4):
+                for attempt in range(1, max_model_retries + 1):
                     try:
-                        logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (attempt {attempt}/3)...")
+                        # Serialize file uploads to avoid bandwidth congestion
+                        if not uploaded_file:
+                            with _UPLOAD_LOCK:
+                                logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB)...")
+                                uploaded_file = self.client.files.upload(file=str(file_path))
+                                poll_start = time.time()
+                                while uploaded_file.state.name == "PROCESSING":
+                                    if time.time() - poll_start > 180:
+                                        raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
+                                    time.sleep(1.0)
+                                    uploaded_file = self.client.files.get(name=uploaded_file.name)
+
+                                if uploaded_file.state.name != "ACTIVE":
+                                    raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+
+                        logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (attempt {attempt}/{max_model_retries})...")
                         t0 = time.time()
                         response = self.client.models.generate_content(
                             model=model_name,
-                            contents=[audio_content_part, prompt],
-                            config=types.GenerateContentConfig(temperature=0.2),
+                            contents=[uploaded_file, prompt],
+                            config=types.GenerateContentConfig(
+                                temperature=0.2,
+                                automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                            ),
                         )
                         text = self._extract_response_text(response)
                         if text:
@@ -186,22 +184,25 @@ class ProsodyTranscriber:
                             logger.info(f"[{file_path.stem}] Success with '{model_name}' ({len(text)} chars in {elapsed:.1f}s).")
                             return text
                         logger.warning(f"[{file_path.stem}] Empty response text from {model_name}.")
+
                     except Exception as e:
                         err_str = str(e)
                         last_error = e
                         if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
                             logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
                             break
-                        elif "503" in err_str or "UNAVAILABLE" in err_str:
-                            wait_s = attempt * 3
-                            logger.warning(f"[{file_path.stem}] '{model_name}' busy (503). Retrying in {wait_s}s...")
+                        elif "503" in err_str or "UNAVAILABLE" in err_str or "timeout" in err_str.lower() or "handshake" in err_str.lower() or "ssl" in err_str.lower():
+                            wait_s = min(60, attempt * 6)
+                            logger.warning(f"[{file_path.stem}] Network/API glitch ({err_str[:60]}...). Retrying in {wait_s}s...")
                             time.sleep(wait_s)
+                            if "ssl" in err_str.lower() or "handshake" in err_str.lower():
+                                uploaded_file = None
                         elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                            wait_s = attempt * 4
+                            wait_s = min(60, attempt * 8)
                             logger.warning(f"[{file_path.stem}] '{model_name}' rate limited (429). Retrying in {wait_s}s...")
                             time.sleep(wait_s)
                         else:
-                            time.sleep(2)
+                            time.sleep(3)
 
             raise RuntimeError(f"All models failed for {file_path.name}: {last_error}")
 
@@ -262,8 +263,8 @@ class ProsodyTranscriber:
         self,
         audio_path: Path,
         episode: Optional[Episode] = None,
-        chunk_duration_sec: int = 480,  # 8 minutes per chunk for optimal throughput & boundary fidelity
-        max_workers: int = 4,
+        chunk_duration_sec: int = 480,  # 8 minutes per chunk
+        max_workers: int = 2,  # 2 workers for peak connection & rate limit stability
     ) -> str:
         """
         Transcribe full audio file using parallel chunks with disk caching and single-pass timestamp normalization.
@@ -276,7 +277,7 @@ class ProsodyTranscriber:
         logger.info(f"Audio file: '{audio_path.name}' ({file_size_mb:.2f} MB, {format_timestamp(duration)})")
 
         if duration > 0 and duration <= chunk_duration_sec:
-            logger.info(f"Audio duration is <= {chunk_duration_sec//60} minutes, transcribing in single pass.")
+            logger.info("Audio duration is <= 8 minutes, transcribing in single pass.")
             return self._transcribe_single_file(audio_path, PROSODY_TRANSCRIPTION_PROMPT)
 
         ffmpeg_bin = shutil.which("ffmpeg")
@@ -327,8 +328,12 @@ class ProsodyTranscriber:
                 }
 
                 for future in concurrent.futures.as_completed(futures):
-                    idx, text = future.result()
-                    chunk_results[idx] = text
+                    try:
+                        idx, text = future.result(timeout=300)
+                        chunk_results[idx] = text
+                    except Exception as e:
+                        logger.warning(f"Chunk transcription error/timeout: {e}")
+                        raise
         else:
             logger.info(f"All {num_chunks} chunks loaded from cache.")
 
