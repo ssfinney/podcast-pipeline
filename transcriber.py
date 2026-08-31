@@ -220,7 +220,12 @@ class ProsodyTranscriber:
                 except Exception as del_err:
                     logger.warning(f"Failed to delete remote file {uploaded_file.name}: {del_err}")
 
-    def audit_transcript(self, audio_path: Path, existing_transcript: str) -> dict:
+    def audit_transcript(
+        self,
+        audio_path: Path,
+        existing_transcript: str,
+        max_model_retries: int = 1,
+    ) -> dict:
         """Have Gemini 3.7 Flash assess an existing transcript against its source audio."""
         prompt = f"""Audit the existing podcast transcript against the attached source audio.
 Use Gemini 3.7 Flash for this audit. Do not rewrite the transcript.
@@ -251,7 +256,7 @@ Existing transcript:
             audio_path,
             prompt,
             preferred_model="gemini-3.7-flash",
-            max_model_retries=3,
+            max_model_retries=max_model_retries,
         ).strip()
         raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.DOTALL).strip()
         try:

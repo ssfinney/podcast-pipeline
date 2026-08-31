@@ -12,8 +12,10 @@ from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
-from downloader import DEFAULT_AUDIO_DIR, DEFAULT_FEED_URL, DEFAULT_PROCESSED_DIR, Episode, fetch_episodes
+from downloader import DEFAULT_FEED_URL, Episode, fetch_episodes
 from pipeline import PodcastPipeline
 
 load_dotenv()
@@ -81,6 +83,12 @@ def audit_and_reprocess(
     """Audit eligible completed episodes, then reprocess only high-confidence failures."""
     episodes = fetch_episodes(feed_url)
     pipeline = PodcastPipeline(model_name="gemini-3.7-flash")
+    # Bound stalled model requests; a 4-minute request is enough for an audit
+    # response while still allowing the ordered fallback to proceed.
+    pipeline.transcriber.client = genai.Client(
+        api_key=pipeline.transcriber.api_key,
+        http_options=types.HttpOptions(timeout=240_000),
+    )
     eligible = _eligible_episodes(episodes, pipeline)
     if limit > 0:
         eligible = eligible[:limit]
