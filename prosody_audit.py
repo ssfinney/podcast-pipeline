@@ -30,13 +30,11 @@ logging.basicConfig(
 ROOT = Path(__file__).parent
 AUDIT_STATE_PATH = ROOT / "prosody_audit.json"
 DEFAULT_CONFIDENCE_THRESHOLD = 0.75
-
-
 def _fingerprint(audio_path: Path, transcript_path: Path) -> str:
-    """Identify the exact local audio/transcript pair audited."""
+    """Identify the exact local audio/transcript pair audited based on contents and sizes."""
     md_hash = hashlib.sha256(transcript_path.read_bytes()).hexdigest()
-    audio_stat = audio_path.stat()
-    return f"{audio_stat.st_size}:{audio_stat.st_mtime_ns}:{md_hash}"
+    audio_size = audio_path.stat().st_size if audio_path.exists() else 0
+    return f"{audio_size}:{md_hash}"
 
 
 def _save_state(state: dict[str, Any]) -> None:
@@ -156,17 +154,18 @@ def audit_and_reprocess(
     selected = [r for r in audit_results if r.get("audit_status") == "AUDITED" and r.get("selected_for_reprocess")]
     reprocessed: list[dict[str, Any]] = []
     by_guid = {episode.guid: episode for episode, _, _ in eligible}
-
     for result in selected:
         episode = by_guid[result["guid"]]
+        ep_audio = pipeline.audio_dir / episode.audio_filename
+        ep_md = pipeline.processed_dir / episode.md_filename
         logger.info("Reprocessing transcript with Gemini 3.7 Flash: %s", episode.title)
         try:
             record = pipeline.process_episode(episode, reprocess_transcript=True)
             result["reprocess_status"] = record.status
             result["reprocessed_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
             result["reprocess_model"] = pipeline.transcriber.last_model_used
-            if record.status in {"SUCCESS", "PARTIAL"}:
-                result["fingerprint"] = _fingerprint(audio_path, md_path)
+            if record.status in {"SUCCESS", "PARTIAL"} and ep_audio.exists() and ep_md.exists():
+                result["fingerprint"] = _fingerprint(ep_audio, ep_md)
                 result["audit_status"] = "REPROCESSED"
                 result["selected_for_reprocess"] = False
                 result["needs_reprocess"] = False
