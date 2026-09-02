@@ -32,12 +32,12 @@ logger = logging.getLogger(__name__)
 # Flash fallbacks before the lower-cost lite models and Pro preview.
 DEFAULT_MODELS = [
     "gemini-3.7-flash",
+    "gemini-3.1-pro-preview",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-3-flash-preview",
     "gemini-3.1-flash-lite",
     "gemini-3.1-flash-lite-preview",
-    "gemini-3.1-pro-preview",
 ]
 
 PROSODY_TRANSCRIPTION_PROMPT = """Transcribe the audio verbatim while capturing full vocal prosody, emotion, and cadence:
@@ -54,6 +54,19 @@ PROSODY_CHUNK_PROMPT = """Transcribe this audio segment verbatim while capturing
 
 # Global lock to serialize audio upload bursts and prevent upstream bandwidth congestion
 _UPLOAD_LOCK = threading.Lock()
+
+
+def get_gemini_api_keys() -> List[str]:
+    """Retrieve all available Gemini API keys in priority order."""
+    keys: List[str] = []
+    for var in ["GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEYS"]:
+        raw = os.getenv(var, "")
+        if raw:
+            for k in raw.split(","):
+                k = k.strip()
+                if k and k not in keys:
+                    keys.append(k)
+    return keys
 
 
 def format_timestamp(seconds: float) -> str:
@@ -111,12 +124,16 @@ class ProsodyTranscriber:
     """Manages audio upload, Gemini prosody transcription, parallel chunking, caching, and file cleanup."""
 
     def __init__(self, api_key: Optional[str] = None, preferred_model: Optional[str] = None):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
+        self.api_keys = [api_key] if api_key else get_gemini_api_keys()
+        if not self.api_keys:
             raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
-        self.client = genai.Client(api_key=self.api_key)
+        self.clients = [genai.Client(api_key=k) for k in self.api_keys]
         self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
         self.last_model_used: Optional[str] = None
+
+    @property
+    def client(self) -> genai.Client:
+        return self.clients[0]
 
     def _extract_response_text(self, response) -> str:
         """Extract text cleanly from Gemini response object."""
@@ -141,9 +158,8 @@ class ProsodyTranscriber:
         max_model_retries: int = 5,
     ) -> str:
         """
-        Generate prosody transcription for an audio file/chunk with serialized upload and parallel inference.
+        Generate prosody transcription for an audio file/chunk with serialized upload, key rotation, and parallel inference.
         """
-        uploaded_file = None
         models_to_try = []
         pref = preferred_model or self.preferred_model
         if pref:
@@ -153,77 +169,96 @@ class ProsodyTranscriber:
                 models_to_try.append(m)
 
         last_error = None
-        try:
-            for model_name in models_to_try:
-                for attempt in range(1, max_model_retries + 1):
-                    try:
-                        # Serialize file uploads to avoid bandwidth congestion
-                        if not uploaded_file:
-                            with _UPLOAD_LOCK:
-                                logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB)...")
-                                uploaded_file = self.client.files.upload(file=str(file_path))
 
-                            # Polling is executed outside the upload lock so other workers are not blocked!
-                            poll_start = time.time()
-                            while uploaded_file.state.name == "PROCESSING":
-                                if time.time() - poll_start > 180:
-                                    raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
-                                time.sleep(1.0)
-                                uploaded_file = self.client.files.get(name=uploaded_file.name)
+        # Iterate across available API keys (with primary key first)
+        for key_idx, client in enumerate(self.clients):
+            uploaded_file = None
+            try:
+                for model_name in models_to_try:
+                    for attempt in range(1, max_model_retries + 1):
+                        try:
+                            # Serialize file uploads to avoid bandwidth congestion
+                            if not uploaded_file:
+                                with _UPLOAD_LOCK:
+                                    logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB) via Key {key_idx+1}...")
+                                    uploaded_file = client.files.upload(file=str(file_path))
 
-                            if uploaded_file.state.name != "ACTIVE":
-                                raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+                                poll_start = time.time()
+                                while uploaded_file.state.name == "PROCESSING":
+                                    if time.time() - poll_start > 180:
+                                        raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
+                                    time.sleep(1.0)
+                                    uploaded_file = client.files.get(name=uploaded_file.name)
 
-                        logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (attempt {attempt}/{max_model_retries})...")
-                        t0 = time.time()
-                        response = self.client.models.generate_content(
-                            model=model_name,
-                            contents=[uploaded_file, prompt],
-                            config=types.GenerateContentConfig(
-                                temperature=0.2,
-                                automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-                            ),
-                        )
-                        text = self._extract_response_text(response)
-                        if text:
-                            self.last_model_used = model_name
-                            elapsed = time.time() - t0
-                            logger.info(f"[{file_path.stem}] Success with '{model_name}' ({len(text)} chars in {elapsed:.1f}s).")
-                            return text
-                        logger.warning(f"[{file_path.stem}] Empty response text from {model_name}.")
+                                if uploaded_file.state.name != "ACTIVE":
+                                    raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
 
-                    except Exception as e:
-                        err_str = str(e)
-                        last_error = e
-                        if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
-                            logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
-                            break
-                        elif any(k in err_str.lower() for k in ("503", "unavailable", "timeout", "handshake", "ssl", "errno 8", "nodename", "servname", "getaddrinfo", "connection", "remote end closed", "unreachable")):
-                            wait_s = min(60, attempt * 8)
-                            logger.warning(f"[{file_path.stem}] Network/API glitch ({err_str[:60]}...). Retrying in {wait_s}s...")
-                            time.sleep(wait_s)
-                            if any(k in err_str.lower() for k in ("ssl", "handshake", "errno 8", "nodename", "connection")):
+                            logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (Key {key_idx+1}, attempt {attempt}/{max_model_retries})...")
+                            t0 = time.time()
+                            response = client.models.generate_content(
+                                model=model_name,
+                                contents=[uploaded_file, prompt],
+                                config=types.GenerateContentConfig(
+                                    temperature=0.2,
+                                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                                ),
+                            )
+                            text = self._extract_response_text(response)
+                            if text:
+                                self.last_model_used = model_name
+                                elapsed = time.time() - t0
+                                logger.info(f"[{file_path.stem}] Success with '{model_name}' ({len(text)} chars in {elapsed:.1f}s).")
+                                return text
+                            logger.warning(f"[{file_path.stem}] Empty response text from {model_name}.")
+
+                        except Exception as e:
+                            err_str = str(e)
+                            last_error = e
+
+                            # Key disabled or permission denied: immediately advance to next API key
+                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str:
+                                logger.warning(f"Key {key_idx+1} lacks permissions or Gemini API is disabled: {err_str[:80]}... Advancing to next key.")
                                 if uploaded_file and uploaded_file.name:
                                     try:
-                                        self.client.files.delete(name=uploaded_file.name)
+                                        client.files.delete(name=uploaded_file.name)
                                     except Exception:
                                         pass
                                 uploaded_file = None
-                        elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                            wait_s = min(60, attempt * 8)
-                            logger.warning(f"[{file_path.stem}] '{model_name}' rate limited (429). Retrying in {wait_s}s...")
-                            time.sleep(wait_s)
-                        else:
-                            time.sleep(5)
+                                break  # Break model retry loop to advance to next key
 
-            raise RuntimeError(f"All models failed for {file_path.name}: {last_error}")
+                            if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
+                                logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
+                                break
+                            elif any(k in err_str.lower() for k in ("503", "unavailable", "timeout", "handshake", "ssl", "errno 8", "nodename", "servname", "getaddrinfo", "connection", "remote end closed", "unreachable")):
+                                wait_s = min(60, attempt * 8)
+                                logger.warning(f"[{file_path.stem}] Network/API glitch ({err_str[:60]}...). Retrying in {wait_s}s...")
+                                time.sleep(wait_s)
+                                if any(k in err_str.lower() for k in ("ssl", "handshake", "errno 8", "nodename", "connection")):
+                                    if uploaded_file and uploaded_file.name:
+                                        try:
+                                            client.files.delete(name=uploaded_file.name)
+                                        except Exception:
+                                            pass
+                                    uploaded_file = None
+                            elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                                wait_s = min(60, attempt * 8)
+                                logger.warning(f"[{file_path.stem}] '{model_name}' rate limited (429). Retrying in {wait_s}s...")
+                                time.sleep(wait_s)
+                            else:
+                                time.sleep(5)
 
-        finally:
-            if uploaded_file and uploaded_file.name:
-                try:
-                    self.client.files.delete(name=uploaded_file.name)
-                except Exception as del_err:
-                    logger.warning(f"Failed to delete remote file {uploaded_file.name}: {del_err}")
+                    # If key was disabled/blocked, jump to next key
+                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error):
+                        break
+
+            finally:
+                if uploaded_file and uploaded_file.name:
+                    try:
+                        client.files.delete(name=uploaded_file.name)
+                    except Exception as del_err:
+                        logger.warning(f"Failed to delete remote file {uploaded_file.name}: {del_err}")
+
+        raise RuntimeError(f"All keys and models failed for {file_path.name}: {last_error}")
 
     def audit_transcript(
         self,
@@ -364,7 +399,6 @@ Existing transcript:
         cache_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}_{chunk_duration_sec}s"
         if force:
             shutil.rmtree(cache_dir, ignore_errors=True)
-            # Also clean legacy un-versioned cache dir if present
             legacy_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}"
             shutil.rmtree(legacy_dir, ignore_errors=True)
 

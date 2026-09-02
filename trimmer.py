@@ -109,11 +109,18 @@ class PreachingTrimmer:
     """Detects preaching boundaries and extracts sermon-only audio files."""
 
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
+        keys = [api_key] if api_key else []
+        if not keys:
+            for var in ["GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEYS"]:
+                raw = os.getenv(var, "")
+                if raw:
+                    for k in raw.split(","):
+                        k = k.strip()
+                        if k and k not in keys:
+                            keys.append(k)
+        if not keys:
             raise ValueError("GEMINI_API_KEY is not set.")
-        self.client = genai.Client(api_key=self.api_key)
-
+        self.clients = [genai.Client(api_key=k) for k in keys]
     def detect_boundaries_from_transcript(
         self,
         transcript_text: str,
@@ -156,55 +163,56 @@ Return strict JSON:
   "reasoning": "<explanation of the selected start and end points>"
 }}"""
 
-        for model_name in ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]:
-            try:
-                resp = self.client.models.generate_content(
-                    model=model_name,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        temperature=0.1,
-                        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-                    ),
-                )
-                raw_json = resp.text.strip()
-                # Clean any markdown code fences
-                raw_json = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_json, flags=re.DOTALL).strip()
-                data = json.loads(raw_json)
+        for client in self.clients:
+            for model_name in ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]:
+                try:
+                    resp = client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            temperature=0.1,
+                            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                        ),
+                    )
+                    raw_json = resp.text.strip()
+                    # Clean any markdown code fences
+                    raw_json = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_json, flags=re.DOTALL).strip()
+                    data = json.loads(raw_json)
 
-                start_ts = data.get("preaching_start_timestamp", "00:00:00")
-                end_ts = data.get("preaching_end_timestamp", format_seconds_to_timestamp(total_duration_sec))
+                    start_ts = data.get("preaching_start_timestamp", "00:00:00")
+                    end_ts = data.get("preaching_end_timestamp", format_seconds_to_timestamp(total_duration_sec))
 
-                start_sec = float(data.get("preaching_start_sec", parse_timestamp_to_seconds(start_ts)))
-                end_sec = float(data.get("preaching_end_sec", parse_timestamp_to_seconds(end_ts)))
+                    start_sec = float(data.get("preaching_start_sec", parse_timestamp_to_seconds(start_ts)))
+                    end_sec = float(data.get("preaching_end_sec", parse_timestamp_to_seconds(end_ts)))
 
-                if total_duration_sec > 0:
-                    if end_sec <= start_sec or end_sec > total_duration_sec + 30:
-                        end_sec = total_duration_sec
-                    # Reject implausibly short sermon spans (e.g. < 10 mins on a normal service)
-                    if total_duration_sec >= 1800 and (end_sec - start_sec < 600):
-                        raise ValueError(
-                            f"Implausible sermon span {format_seconds_to_timestamp(start_sec)} -> "
-                            f"{format_seconds_to_timestamp(end_sec)} for a {format_seconds_to_timestamp(total_duration_sec)} service"
-                        )
+                    if total_duration_sec > 0:
+                        if end_sec <= start_sec or end_sec > total_duration_sec + 30:
+                            end_sec = total_duration_sec
+                        # Reject implausibly short sermon spans (e.g. < 10 mins on a normal service)
+                        if total_duration_sec >= 1800 and (end_sec - start_sec < 600):
+                            raise ValueError(
+                                f"Implausible sermon span {format_seconds_to_timestamp(start_sec)} -> "
+                                f"{format_seconds_to_timestamp(end_sec)} for a {format_seconds_to_timestamp(total_duration_sec)} service"
+                            )
 
-                boundary = SermonBoundary(
-                    start_timestamp=format_seconds_to_timestamp(start_sec),
-                    end_timestamp=format_seconds_to_timestamp(end_sec),
-                    start_seconds=start_sec,
-                    end_seconds=end_sec,
-                    speaker_name=data.get("speaker_name", "Preacher"),
-                    first_words=data.get("first_words", ""),
-                    last_words=data.get("last_words", ""),
-                    reasoning=data.get("reasoning", ""),
-                )
-                logger.info(
-                    f"Detected sermon boundary: {boundary.start_timestamp} -> {boundary.end_timestamp} "
-                    f"by {boundary.speaker_name}"
-                )
-                return boundary
-            except Exception as e:
-                logger.warning(f"Error detecting sermon boundaries with {model_name}: {e}")
+                    boundary = SermonBoundary(
+                        start_timestamp=format_seconds_to_timestamp(start_sec),
+                        end_timestamp=format_seconds_to_timestamp(end_sec),
+                        start_seconds=start_sec,
+                        end_seconds=end_sec,
+                        speaker_name=data.get("speaker_name", "Preacher"),
+                        first_words=data.get("first_words", ""),
+                        last_words=data.get("last_words", ""),
+                        reasoning=data.get("reasoning", ""),
+                    )
+                    logger.info(
+                        f"Detected sermon boundary: {boundary.start_timestamp} -> {boundary.end_timestamp} "
+                        f"by {boundary.speaker_name}"
+                    )
+                    return boundary
+                except Exception as e:
+                    logger.warning(f"Error detecting sermon boundaries with {model_name}: {e}")
 
         # Fallback based on reasonable church service liturgy
         fallback_start = total_duration_sec * 0.35 if total_duration_sec > 0 else 1800.0
