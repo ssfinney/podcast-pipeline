@@ -236,12 +236,24 @@ class PodcastPipeline:
         trimmed_dest = self.trimmed_dir / f"{Path(episode.audio_filename).stem} - Preaching.mp3"
         existing_record = self.manifest.get(episode.guid)
 
+        # Self-heal from Google Drive mirror if local file was deleted/untracked
+        if not md_dest.exists() and self.drive_uploader.local_drive_path and self.drive_uploader.local_drive_path.exists():
+            drive_md = self.drive_uploader.local_drive_path / "Transcripts" / episode.md_filename
+            if drive_md.exists() and drive_md.stat().st_size > 200:
+                shutil.copy2(drive_md, md_dest)
+                logger.info(f"Restored transcript from Google Drive: {md_dest.name}")
+
+        if not trimmed_dest.exists() and self.drive_uploader.local_drive_path and self.drive_uploader.local_drive_path.exists():
+            drive_trimmed = self.drive_uploader.local_drive_path / "TrimmedAudio" / trimmed_dest.name
+            if drive_trimmed.exists() and drive_trimmed.stat().st_size > 1024:
+                shutil.copy2(drive_trimmed, trimmed_dest)
+                logger.info(f"Restored trimmed audio from Google Drive: {trimmed_dest.name}")
+
         if not force and not reprocess_transcript and md_dest.exists() and md_dest.stat().st_size > 200 and trimmed_dest.exists():
             if existing_record and existing_record.get("status") in ["SUCCESS", "PARTIAL"]:
                 logger.info(f"Episode already fully processed & trimmed: {md_dest.name}")
                 valid_fields = set(ProcessingRecord.__dataclass_fields__)
                 return ProcessingRecord(**{k: v for k, v in existing_record.items() if k in valid_fields})
-
         # Step 1: Audio Download & Extraction
         try:
             audio_path, downloaded = download_audio(
