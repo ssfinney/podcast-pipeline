@@ -83,10 +83,10 @@ def audit_and_reprocess(
     pipeline = PodcastPipeline(model_name="gemini-3.7-flash")
     # Bound stalled model requests; a 4-minute request is enough for an audit
     # response while still allowing the ordered fallback to proceed.
-    pipeline.transcriber.client = genai.Client(
-        api_key=pipeline.transcriber.api_key,
-        http_options=types.HttpOptions(timeout=240_000),
-    )
+    pipeline.transcriber.clients = [
+        genai.Client(api_key=k, http_options=types.HttpOptions(timeout=240_000))
+        for k in pipeline.transcriber.api_keys
+    ]
     eligible = _eligible_episodes(episodes, pipeline)
     if limit > 0:
         eligible = eligible[:limit]

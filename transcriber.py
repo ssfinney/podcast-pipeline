@@ -215,9 +215,9 @@ class ProsodyTranscriber:
                             err_str = str(e)
                             last_error = e
 
-                            # Key disabled or permission denied: immediately advance to next API key
-                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str:
-                                logger.warning(f"Key {key_idx+1} lacks permissions or Gemini API is disabled: {err_str[:80]}... Advancing to next key.")
+                            # Key disabled, permission denied, or upload rate limited: advance immediately to next API key
+                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str or (not uploaded_file and ("429" in err_str or "RESOURCE_EXHAUSTED" in err_str)):
+                                logger.warning(f"Key {key_idx+1} hit error during upload/auth ({err_str[:80]}...). Advancing immediately to next key.")
                                 if uploaded_file and uploaded_file.name:
                                     try:
                                         client.files.delete(name=uploaded_file.name)
@@ -225,7 +225,6 @@ class ProsodyTranscriber:
                                         pass
                                 uploaded_file = None
                                 break  # Break model retry loop to advance to next key
-
                             if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
                                 logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
                                 break
@@ -247,10 +246,9 @@ class ProsodyTranscriber:
                             else:
                                 time.sleep(5)
 
-                    # If key was disabled/blocked, jump to next key
-                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error):
+                    # If key was disabled/blocked/throttled on upload, jump to next key
+                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error) or not uploaded_file:
                         break
-
             finally:
                 if uploaded_file and uploaded_file.name:
                     try:
