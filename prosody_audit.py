@@ -63,7 +63,7 @@ def _eligible_episodes(episodes: list[Episode], pipeline: PodcastPipeline) -> li
         audio_path = pipeline.audio_dir / episode.audio_filename
         record = pipeline.manifest.get(episode.guid, {})
         if (
-            record.get("status") in {"SUCCESS", "PARTIAL"}
+            record.get("status") in {"SUCCESS", "PARTIAL", "FAILED"}
             and md_path.exists()
             and md_path.stat().st_size > 200
             and audio_path.exists()
