@@ -198,19 +198,18 @@ class ProsodyTranscriber:
                         if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
                             logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
                             break
-                        elif "503" in err_str or "UNAVAILABLE" in err_str or "timeout" in err_str.lower() or "handshake" in err_str.lower() or "ssl" in err_str.lower():
-                            wait_s = min(60, attempt * 6)
+                        elif any(k in err_str.lower() for k in ("503", "unavailable", "timeout", "handshake", "ssl", "errno 8", "nodename", "servname", "getaddrinfo", "connection", "remote end closed", "unreachable")):
+                            wait_s = min(60, attempt * 8)
                             logger.warning(f"[{file_path.stem}] Network/API glitch ({err_str[:60]}...). Retrying in {wait_s}s...")
                             time.sleep(wait_s)
-                            if "ssl" in err_str.lower() or "handshake" in err_str.lower():
+                            if any(k in err_str.lower() for k in ("ssl", "handshake", "errno 8", "nodename", "connection")):
                                 uploaded_file = None
                         elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
                             wait_s = min(60, attempt * 8)
                             logger.warning(f"[{file_path.stem}] '{model_name}' rate limited (429). Retrying in {wait_s}s...")
                             time.sleep(wait_s)
                         else:
-                            time.sleep(3)
-
+                            time.sleep(5)
             raise RuntimeError(f"All models failed for {file_path.name}: {last_error}")
 
         finally:
