@@ -110,11 +110,16 @@ class PodcastPipeline:
             with open(tmp_path, "w", encoding="utf-8") as f:
                 json.dump(self.manifest, f, indent=2, ensure_ascii=False)
             os.replace(tmp_path, MANIFEST_PATH)
-            self.export_indexes()
         except Exception as e:
             if tmp_path.exists():
                 tmp_path.unlink(missing_ok=True)
             logger.warning(f"Could not save manifest: {e}")
+            return
+
+        try:
+            self.export_indexes()
+        except Exception as idx_err:
+            logger.warning(f"Index export failed after manifest save: {idx_err}")
 
     def export_indexes(self):
         """Export master INDEX.md and index.csv, and sync to Google Drive."""
@@ -188,9 +193,9 @@ class PodcastPipeline:
                 title_clean = r.title.replace("|", "-")
                 preach_seg = f"`{r.preaching_start or '00:00:00'}` → `{r.preaching_end or 'End'}`"
                 status_badge = "✅ SUCCESS" if r.status == "SUCCESS" else f"⚠️ {r.status}"
-                md_link = f"[{r.md_file}](Transcripts/{r.md_file})" if r.md_file else "N/A"
+                md_link = f"[{r.md_file}]({self.processed_dir.name}/{r.md_file})" if r.md_file else "N/A"
                 audio_link = (
-                    f"[{r.trimmed_audio_file}](TrimmedAudio/{r.trimmed_audio_file})"
+                    f"[{r.trimmed_audio_file}]({self.trimmed_dir.name}/{r.trimmed_audio_file})"
                     if r.trimmed_audio_file
                     else "N/A"
                 )
@@ -214,6 +219,7 @@ class PodcastPipeline:
                 logger.info("Synced INDEX.md and index.csv to Google Drive root folder.")
             except Exception as e:
                 logger.warning(f"Failed copying index files to Drive: {e}")
+
     def process_episode(
         self,
         episode: Episode,
@@ -233,7 +239,8 @@ class PodcastPipeline:
         if not force and not reprocess_transcript and md_dest.exists() and md_dest.stat().st_size > 200 and trimmed_dest.exists():
             if existing_record and existing_record.get("status") in ["SUCCESS", "PARTIAL"]:
                 logger.info(f"Episode already fully processed & trimmed: {md_dest.name}")
-                return ProcessingRecord(**existing_record)
+                valid_fields = set(ProcessingRecord.__dataclass_fields__)
+                return ProcessingRecord(**{k: v for k, v in existing_record.items() if k in valid_fields})
 
         # Step 1: Audio Download & Extraction
         try:
@@ -289,6 +296,7 @@ class PodcastPipeline:
                 raw_transcript = self.transcriber.transcribe_audio_file(
                     audio_path=audio_path,
                     episode=episode,
+                    force=force or reprocess_transcript,
                 )
                 transcription_time = round(time.time() - t0, 1)
                 md_path = self.transcriber.create_formatted_markdown(
@@ -339,23 +347,29 @@ class PodcastPipeline:
             logger.warning(f"Could not trim preaching audio for '{episode.title}': {e}")
 
         # Step 4: Google Drive Sync (Transcripts & Trimmed Audio)
-        drive_info = self.drive_uploader.upload_markdown(
-            file_path=md_path,
-            title=f"{episode.date_iso} - {episode.title}",
-            description=f"Prosody transcript for: {episode.title}",
-        )
-        if trimmed_path and trimmed_path.exists():
-            self.drive_uploader.upload_audio(
-                file_path=trimmed_path,
-                title=f"{episode.date_iso} - {episode.title} - Preaching",
-                description=f"Preaching section only ({boundary.start_timestamp if boundary else 'N/A'})",
+        drive_file_id = None
+        drive_link = None
+        try:
+            drive_info = self.drive_uploader.upload_markdown(
+                file_path=md_path,
+                title=f"{episode.date_iso} - {episode.title}",
+                description=f"Prosody transcript for: {episode.title}",
             )
+            if trimmed_path and trimmed_path.exists():
+                self.drive_uploader.upload_audio(
+                    file_path=trimmed_path,
+                    title=f"{episode.date_iso} - {episode.title} - Preaching",
+                    description=f"Preaching section only ({boundary.start_timestamp if boundary else 'N/A'})",
+                )
 
-        drive_file_id = drive_info.get("file_id") if drive_info else None
-        drive_link = (
-            drive_info.get("web_view_link")
-            or f"https://drive.google.com/drive/folders/{self.drive_uploader.transcripts_folder_id}"
-        )
+            if drive_info:
+                drive_file_id = drive_info.get("file_id")
+                drive_link = (
+                    drive_info.get("web_view_link")
+                    or f"https://drive.google.com/drive/folders/{self.drive_uploader.transcripts_folder_id}"
+                )
+        except Exception as drive_err:
+            logger.warning(f"Drive upload note for '{episode.title}': {drive_err}")
 
         # Step 5: Direct NotebookLM Ingestion (if authenticated)
         if self.notebooklm_syncer.is_available:
@@ -442,15 +456,36 @@ class PodcastPipeline:
                     next_episode = target_episodes[idx + 1]
                     prefetch_future = prefetch_executor.submit(prefetch_worker, next_episode)
 
-                record = self.process_episode(ep, force=force)
+                try:
+                    record = self.process_episode(ep, force=force)
+                except Exception as unhandled_err:
+                    logger.error(f"Unhandled error processing episode '{ep.title}': {unhandled_err}", exc_info=True)
+                    record = ProcessingRecord(
+                        index=ep.index,
+                        guid=ep.guid,
+                        title=ep.title,
+                        date_iso=ep.date_iso,
+                        pub_date=ep.pub_date,
+                        duration=ep.duration,
+                        audio_file=ep.audio_filename,
+                        audio_size_mb=0.0,
+                        md_file=ep.md_filename,
+                        status="FAILED",
+                        error=str(unhandled_err),
+                    )
+                    self.manifest[ep.guid] = record.to_dict()
+                    self._save_manifest()
+
                 results.append(record)
 
                 # Wait for next episode's prefetch to finish before moving to next iteration
                 if prefetch_future:
                     try:
-                        prefetch_future.result(timeout=600)
-                    except Exception:
-                        pass
+                        prefetch_future.result(timeout=1200)
+                    except concurrent.futures.TimeoutError:
+                        logger.warning(f"Prefetch timed out for episode index {idx + 1}; proceeding.")
+                    except Exception as prefetch_err:
+                        logger.warning(f"Prefetch error note: {prefetch_err}")
 
         self.print_summary_table(results)
         return results

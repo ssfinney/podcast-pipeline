@@ -28,7 +28,7 @@ static_ffmpeg.add_paths()
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# Model preference order: favor the available 3.7 Flash model, then stable
+# Model preference order: favor the latest available 3.7 Flash model, then stable
 # Flash fallbacks before the lower-cost lite models and Pro preview.
 DEFAULT_MODELS = [
     "gemini-3.7-flash",
@@ -203,6 +203,11 @@ class ProsodyTranscriber:
                             logger.warning(f"[{file_path.stem}] Network/API glitch ({err_str[:60]}...). Retrying in {wait_s}s...")
                             time.sleep(wait_s)
                             if any(k in err_str.lower() for k in ("ssl", "handshake", "errno 8", "nodename", "connection")):
+                                if uploaded_file and uploaded_file.name:
+                                    try:
+                                        self.client.files.delete(name=uploaded_file.name)
+                                    except Exception:
+                                        pass
                                 uploaded_file = None
                         elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
                             wait_s = min(60, attempt * 8)
@@ -210,6 +215,7 @@ class ProsodyTranscriber:
                             time.sleep(wait_s)
                         else:
                             time.sleep(5)
+
             raise RuntimeError(f"All models failed for {file_path.name}: {last_error}")
 
         finally:
@@ -321,7 +327,7 @@ Existing transcript:
             return idx, raw_chunk_text
         finally:
             if chunk_audio_file.exists():
-                chunk_audio_file.unlink()
+                chunk_audio_file.unlink(missing_ok=True)
 
     def transcribe_audio_file(
         self,
@@ -329,6 +335,7 @@ Existing transcript:
         episode: Optional[Episode] = None,
         chunk_duration_sec: int = 480,  # 8 minutes per chunk
         max_workers: int = 2,  # 2 workers for peak connection & rate limit stability
+        force: bool = False,
     ) -> str:
         """
         Transcribe full audio file using parallel chunks with disk caching and single-pass timestamp normalization.
@@ -354,8 +361,18 @@ Existing transcript:
         num_chunks = math.ceil(duration / chunk_duration_sec)
         logger.info(f"Processing audio in {num_chunks} chunks ({chunk_duration_sec//60}m each) with {max_workers} parallel workers.")
 
-        cache_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}"
+        cache_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}_{chunk_duration_sec}s"
+        if force:
+            shutil.rmtree(cache_dir, ignore_errors=True)
+            # Also clean legacy un-versioned cache dir if present
+            legacy_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}"
+            shutil.rmtree(legacy_dir, ignore_errors=True)
+
         cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # Clean any orphaned .mp3 audio slices in cache dir
+        for stray_mp3 in cache_dir.glob("chunk_*.mp3"):
+            stray_mp3.unlink(missing_ok=True)
 
         chunk_results: Dict[int, str] = {}
 
@@ -373,47 +390,54 @@ Existing transcript:
                 seg_len = min(chunk_duration_sec, duration - start_sec)
                 needed_chunks.append((idx, start_sec, seg_len, self.preferred_model))
 
-        if needed_chunks:
-            logger.info(f"{len(chunk_results)}/{num_chunks} chunks already cached, {len(needed_chunks)} chunks to process.")
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                futures = {
-                    executor.submit(
-                        self._process_chunk_worker,
-                        idx=idx,
-                        total_chunks=num_chunks,
-                        start_sec=start_sec,
-                        seg_len=seg_len,
-                        audio_path=audio_path,
-                        cache_dir=cache_dir,
-                        ffmpeg_bin=ffmpeg_bin,
-                        model_name=model,
-                    ): idx
-                    for idx, start_sec, seg_len, model in needed_chunks
-                }
+        try:
+            if needed_chunks:
+                logger.info(f"{len(chunk_results)}/{num_chunks} chunks already cached, {len(needed_chunks)} chunks to process.")
+                with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    futures = {
+                        executor.submit(
+                            self._process_chunk_worker,
+                            idx=idx,
+                            total_chunks=num_chunks,
+                            start_sec=start_sec,
+                            seg_len=seg_len,
+                            audio_path=audio_path,
+                            cache_dir=cache_dir,
+                            ffmpeg_bin=ffmpeg_bin,
+                            model_name=model,
+                        ): idx
+                        for idx, start_sec, seg_len, model in needed_chunks
+                    }
 
-                for future in concurrent.futures.as_completed(futures):
-                    try:
-                        idx, text = future.result(timeout=300)
-                        chunk_results[idx] = text
-                    except Exception as e:
-                        logger.warning(f"Chunk transcription error/timeout: {e}")
-                        raise
-        else:
-            logger.info(f"All {num_chunks} chunks loaded from cache.")
+                    for future in concurrent.futures.as_completed(futures):
+                        try:
+                            idx, text = future.result(timeout=300)
+                            chunk_results[idx] = text
+                        except Exception as e:
+                            logger.warning(f"Chunk transcription error/timeout: {e}")
+                            raise
+            else:
+                logger.info(f"All {num_chunks} chunks loaded from cache.")
 
-        # 3. Assemble and normalize timestamps in a single pass
-        full_transcripts = []
-        for i in range(num_chunks):
-            raw_text = chunk_results.get(i, "")
-            start_sec = i * chunk_duration_sec
-            adjusted_text = adjust_chunk_timestamps(raw_text, start_sec)
-            full_transcripts.append(adjusted_text)
+            # 3. Assemble and normalize timestamps in a single pass
+            full_transcripts = []
+            for i in range(num_chunks):
+                raw_text = chunk_results.get(i, "")
+                start_sec = i * chunk_duration_sec
+                adjusted_text = adjust_chunk_timestamps(raw_text, start_sec)
+                full_transcripts.append(adjusted_text)
 
-        full_transcript = "\n\n".join(full_transcripts)
+            full_transcript = "\n\n".join(full_transcripts)
 
-        # Cleanup cache on complete success
-        shutil.rmtree(cache_dir, ignore_errors=True)
-        return full_transcript
+            # Cleanup cache on complete success
+            shutil.rmtree(cache_dir, ignore_errors=True)
+            return full_transcript
+
+        finally:
+            # Always clean orphaned intermediate chunk audio slices
+            if cache_dir.exists():
+                for stray in cache_dir.glob("chunk_*.mp3"):
+                    stray.unlink(missing_ok=True)
 
     def create_formatted_markdown(
         self,

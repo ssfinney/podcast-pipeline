@@ -79,7 +79,7 @@ def get_audio_info(audio_path: Path) -> Tuple[float, int]:
         return 0.0, 0
     try:
         cmd = [ffprobe_bin, "-v", "quiet", "-print_format", "json", "-show_format", str(audio_path)]
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30)
         data = json.loads(res.stdout).get("format", {})
         dur = float(data.get("duration", 0.0))
         bitrate = int(data.get("bit_rate", 0))

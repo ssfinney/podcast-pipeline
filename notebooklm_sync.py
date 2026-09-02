@@ -199,7 +199,7 @@ class NotebookLMSync:
             title = dup.get("title")
             logger.info(f"Deleting duplicate source in NotebookLM: {sid} ({title})...")
             del_cmd = ["notebooklm", "source", "delete", sid, "-y", "-n", self.notebook_id]
-            res = subprocess.run(del_cmd, capture_output=True, text=True)
+            res = subprocess.run(del_cmd, capture_output=True, text=True, timeout=30)
             if res.returncode == 0:
                 deleted_count += 1
             else:

@@ -87,8 +87,8 @@ def get_audio_duration(audio_path: Path) -> float:
 
 def clean_text_for_boundary_detection(text: str) -> str:
     """
-    Strip heavy prosody markdown and retain beginning (up to 55m in) and conclusion
-    to guarantee the preacher transition is captured.
+    Strip heavy inline acoustic tags while retaining full text context for accurate boundary detection.
+    Gemini 3.7 / 3.5 / 3.1 Flash natively handles 1M+ token contexts (~4MB text).
     """
     clean = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
     clean = re.sub(
@@ -99,9 +99,9 @@ def clean_text_for_boundary_detection(text: str) -> str:
     )
     clean = re.sub(r"\n{3,}", "\n\n", clean).strip()
 
-    # Church service sermons frequently start 35-50 minutes in; retain first 45k chars and last 20k chars
-    if len(clean) > 65000:
-        clean = clean[:45000] + "\n\n... [MIDDLE TEACHING PORTION] ...\n\n" + clean[-20000:]
+    # Retain full transcript unless excessively huge (> 400k chars)
+    if len(clean) > 400000:
+        clean = clean[:280000] + "\n\n... [MIDDLE TEACHING PORTION] ...\n\n" + clean[-100000:]
     return clean
 
 
@@ -156,7 +156,7 @@ Return strict JSON:
   "reasoning": "<explanation of the selected start and end points>"
 }}"""
 
-        for model_name in ["gemini-3.1-flash-lite", "gemini-3.1-flash-lite-preview", "gemini-3.5-flash"]:
+        for model_name in ["gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]:
             try:
                 resp = self.client.models.generate_content(
                     model=model_name,
@@ -181,6 +181,12 @@ Return strict JSON:
                 if total_duration_sec > 0:
                     if end_sec <= start_sec or end_sec > total_duration_sec + 30:
                         end_sec = total_duration_sec
+                    # Reject implausibly short sermon spans (e.g. < 10 mins on a normal service)
+                    if total_duration_sec >= 1800 and (end_sec - start_sec < 600):
+                        raise ValueError(
+                            f"Implausible sermon span {format_seconds_to_timestamp(start_sec)} -> "
+                            f"{format_seconds_to_timestamp(end_sec)} for a {format_seconds_to_timestamp(total_duration_sec)} service"
+                        )
 
                 boundary = SermonBoundary(
                     start_timestamp=format_seconds_to_timestamp(start_sec),
@@ -200,8 +206,8 @@ Return strict JSON:
             except Exception as e:
                 logger.warning(f"Error detecting sermon boundaries with {model_name}: {e}")
 
-        # Fallback
-        fallback_start = total_duration_sec * 0.4 if total_duration_sec > 0 else 1800.0
+        # Fallback based on reasonable church service liturgy
+        fallback_start = total_duration_sec * 0.35 if total_duration_sec > 0 else 1800.0
         fallback_end = total_duration_sec if total_duration_sec > 0 else 5400.0
         return SermonBoundary(
             start_timestamp=format_seconds_to_timestamp(fallback_start),
@@ -264,7 +270,7 @@ Return strict JSON:
 
         if not tmp_path.exists() or tmp_path.stat().st_size < 1024:
             if tmp_path.exists():
-                tmp_path.unlink()
+                tmp_path.unlink(missing_ok=True)
             raise RuntimeError(f"Failed to generate trimmed audio: {tmp_path}")
 
         tmp_path.replace(dest_path)

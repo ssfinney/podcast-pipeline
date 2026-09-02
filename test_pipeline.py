@@ -38,7 +38,8 @@ def test_repetition_detector():
     assert detect_repetition_loops(loop_text) is not None
 
 
-def test_transcript_validation_flow(tmp_path):
+def test_transcript_validation_flow(tmp_path, monkeypatch):
+    monkeypatch.setenv("CI", "true")
     # Test validator with a realistic sample transcript fixture
     processed_dir = tmp_path / "ProcessedMD"
     processed_dir.mkdir()

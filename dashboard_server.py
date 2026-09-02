@@ -84,10 +84,7 @@ def get_feed_entries() -> List[dict]:
 
     try:
         eps = fetch_episodes(DEFAULT_FEED_URL)
-        data = [e.to_dict() for e in eps]
-        with open(FEED_CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f)
-        return data
+        return [e.to_dict() for e in eps]
     except Exception as e:
         logger.warning(f"Error fetching feed: {e}")
         return []
@@ -124,14 +121,15 @@ def detect_current_active_stage() -> Dict[str, Any]:
         return active_info
 
     # 2. Check if transcribing chunks (.chunk_cache_*)
-    chunk_dirs = list(AUDIO_DIR.glob(".chunk_cache_*"))
+    raw_chunk_dirs = [d for d in AUDIO_DIR.glob(".chunk_cache_*") if d.is_dir()]
+    chunk_dirs = [d for d in raw_chunk_dirs if time.time() - d.stat().st_mtime < 900]
     if chunk_dirs:
-        cdir = chunk_dirs[0]
-        title = cdir.name.replace(".chunk_cache_", "")
+        cdir = max(chunk_dirs, key=lambda d: d.stat().st_mtime)
+        title = re.sub(r"^\.chunk_cache_", "", cdir.name)
+        title = re.sub(r"_\d+s$", "", title)
         txt_chunks = len(list(cdir.glob("chunk_*.txt")))
         mp3_chunks = len(list(cdir.glob("chunk_*.mp3")))
-        total_estimate = max(17, txt_chunks + mp3_chunks)
-
+        total_estimate = max(txt_chunks + mp3_chunks, 1)
         active_info.update({
             "is_active": True,
             "stage": "TRANSCRIBING",
@@ -809,7 +807,9 @@ class DashboardRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "text/html; charset=utf-8")
             self.end_headers()
-            self.wfile.write(DASHBOARD_HTML.encode("utf-8"))
+            html_file = BASE_DIR / "dashboard.html"
+            content = html_file.read_bytes() if html_file.exists() else DASHBOARD_HTML.encode("utf-8")
+            self.wfile.write(content)
             return
 
         elif path == "/api/status":
@@ -844,11 +844,14 @@ class DashboardRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 
 def run_dashboard_server(port: int = PORT):
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.ThreadingTCPServer(("", port), DashboardRequestHandler) as httpd:
-        logger.info(f"Dashboard server live at: http://localhost:{port}")
-        httpd.serve_forever()
+    class _Server(socketserver.ThreadingTCPServer):
+        allow_reuse_address = True
+        daemon_threads = True
 
+    host = os.getenv("DASHBOARD_HOST", "127.0.0.1")
+    with _Server((host, port), DashboardRequestHandler) as httpd:
+        logger.info(f"Dashboard server live at: http://{host}:{port}")
+        httpd.serve_forever()
 
 if __name__ == "__main__":
     run_dashboard_server()

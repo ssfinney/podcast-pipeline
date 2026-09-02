@@ -258,6 +258,7 @@ def download_audio(
         logger.info("Attempting fallback with yt-dlp...")
         yt_cmd = [
             "yt-dlp",
+            "--no-part",
             "-x",
             "--audio-format",
             "mp3",
@@ -267,8 +268,12 @@ def download_audio(
             str(tmp_path),
             episode.media_url,
         ]
-        subprocess.run(yt_cmd, check=True, timeout=600)
-
+        try:
+            subprocess.run(yt_cmd, capture_output=True, text=True, check=True, timeout=600)
+        except (OSError, subprocess.SubprocessError) as yt_err:
+            for stray in audio_dir.glob(f"{tmp_path.stem}.*"):
+                stray.unlink(missing_ok=True)
+            raise RuntimeError(f"ffmpeg failed ({e}); yt-dlp fallback failed ({yt_err})") from yt_err
     if not tmp_path.exists() or tmp_path.stat().st_size < 1024:
         if tmp_path.exists():
             tmp_path.unlink()

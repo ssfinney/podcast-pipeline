@@ -48,7 +48,6 @@ class DriveUploader:
         try:
             from google.auth.transport.requests import Request
             from google.oauth2.credentials import Credentials
-            from google_auth_oauthlib.flow import InstalledAppFlow
             from googleapiclient.discovery import build
 
             creds = None
@@ -64,21 +63,24 @@ class DriveUploader:
                         creds.refresh(Request())
                     except Exception:
                         creds = None
-                elif self.credentials_file.exists():
+                elif self.credentials_file.exists() and os.getenv("DRIVE_INTERACTIVE_AUTH") == "1":
                     try:
+                        from google_auth_oauthlib.flow import InstalledAppFlow
+
                         flow = InstalledAppFlow.from_client_secrets_file(str(self.credentials_file), SCOPES)
                         creds = flow.run_local_server(port=0)
                         with open(self.token_file, "w") as token:
                             token.write(creds.to_json())
-                    except Exception:
+                    except Exception as flow_err:
+                        logger.warning(f"Interactive Drive auth failed: {flow_err}")
                         creds = None
 
             if creds and creds.valid:
                 self.service = build("drive", "v3", credentials=creds)
                 self._api_authenticated = True
                 logger.info("Google Drive REST API authenticated.")
-        except Exception:
-            pass
+        except Exception as init_err:
+            logger.debug(f"Drive API init exception: {init_err}")
 
         if self.local_drive_path and self.local_drive_path.parent.exists():
             (self.local_drive_path / "Transcripts").mkdir(parents=True, exist_ok=True)
@@ -111,18 +113,21 @@ class DriveUploader:
             "web_view_link": None,
         }
 
-        # 1. Prefer local Google Drive folder if available (instant, zero duplicate API calls)
+        # 1. Prefer local Google Drive folder if available (atomic temp copy, zero duplicate API calls)
         if self.local_drive_path and self.local_drive_path.exists():
             dest_dir = self.local_drive_path / subfolder
             dest_dir.mkdir(parents=True, exist_ok=True)
             dest_file = dest_dir / file_path.name
+            staging_file = dest_dir / f".{file_path.name}.partial"
             try:
-                shutil.copy2(file_path, dest_file)
+                shutil.copy2(file_path, staging_file)
+                os.replace(staging_file, dest_file)
                 logger.info(f"Synced to Google Drive ({subfolder}): {dest_file.name}")
                 result["local_drive_dest"] = str(dest_file)
                 result["web_view_link"] = f"https://drive.google.com/drive/folders/{result['folder_id']}"
                 return result
             except Exception as e:
+                staging_file.unlink(missing_ok=True)
                 logger.warning(f"Error copying to local Google Drive: {e}")
 
         # 2. Upload via Drive REST API only if local sync is not available
@@ -152,7 +157,8 @@ class DriveUploader:
             except Exception as e:
                 logger.warning(f"API upload failed: {e}")
 
-        return result
+        logger.error(f"All Drive transports unavailable or failed for {file_path.name}")
+        return None
 
     def upload_markdown(
         self,
