@@ -567,15 +567,15 @@
     "filename": "2026-05-10 - Mother's Day Panel.md",
     "date_iso": "2026-05-10",
     "title": "Mother's Day Panel",
-    "status": "WARN",
+    "status": "PASS",
     "raw_audio_size_mb": 41.35,
     "raw_duration_s": 5419.9,
-    "trimmed_audio_size_mb": 4.73,
-    "trimmed_duration_s": 620.0,
-    "sermon_ratio": 0.11,
-    "word_count": 14516,
-    "prosody_stress_count": 269,
-    "prosody_tag_count": 105,
+    "trimmed_audio_size_mb": 29.83,
+    "trimmed_duration_s": 3910.0,
+    "sermon_ratio": 0.72,
+    "word_count": 14575,
+    "prosody_stress_count": 136,
+    "prosody_tag_count": 184,
     "checks": [
       {
         "check_name": "RAW_AUDIO_SIZE",
@@ -593,25 +593,25 @@
         "check_name": "TRIMMED_AUDIO_EXISTS",
         "passed": true,
         "severity": "INFO",
-        "message": "Trimmed audio exists (4.73 MB)."
+        "message": "Trimmed audio exists (29.83 MB)."
       },
       {
         "check_name": "PREACHING_DURATION",
         "passed": true,
         "severity": "INFO",
-        "message": "Sermon length: 10.3m."
+        "message": "Sermon length: 65.2m."
       },
       {
         "check_name": "SERMON_RATIO",
-        "passed": false,
-        "severity": "WARNING",
-        "message": "Sermon takes 11.4% of total service."
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 72.1% of service."
       },
       {
         "check_name": "TRANSCRIPT_EXISTS",
         "passed": true,
         "severity": "INFO",
-        "message": "Transcript size: 72156 chars (14516 words)."
+        "message": "Transcript size: 70915 chars (14575 words)."
       },
       {
         "check_name": "FRONTMATTER_VALID",
@@ -623,19 +623,19 @@
         "check_name": "PROSODY_STRESS",
         "passed": true,
         "severity": "INFO",
-        "message": "Found 269 vocal stress emphasis tags."
+        "message": "Found 136 vocal stress emphasis tags."
       },
       {
         "check_name": "PROSODY_TAGS",
         "passed": true,
         "severity": "INFO",
-        "message": "Found 105 inline prosody/cadence tags."
+        "message": "Found 184 inline prosody/cadence tags."
       },
       {
         "check_name": "SPEAKER_TIMESTAMPS",
         "passed": true,
         "severity": "INFO",
-        "message": "Found 245 speaker timestamp headings."
+        "message": "Found 96 speaker timestamp headings."
       },
       {
         "check_name": "NO_REPETITION_LOOPS",
