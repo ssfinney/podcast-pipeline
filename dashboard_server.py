@@ -105,8 +105,8 @@ def detect_current_active_stage() -> Dict[str, Any]:
         "chunks_total": 0,
     }
 
-    # 1. Check if downloading audio (.tmp.mp3)
-    tmp_audios = list(AUDIO_DIR.glob("*.tmp.mp3"))
+    # 1. Check if downloading audio (.tmp.mp3 modified within last 5 minutes)
+    tmp_audios = [f for f in AUDIO_DIR.glob("*.tmp.mp3") if time.time() - f.stat().st_mtime < 300]
     if tmp_audios:
         tmp_file = tmp_audios[0]
         size_mb = tmp_file.stat().st_size / (1024 * 1024)

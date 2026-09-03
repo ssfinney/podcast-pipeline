@@ -83,7 +83,12 @@ def create_genai_clients(preferred_key: Optional[str] = None) -> List[genai.Clie
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = expanded_cred
             try:
                 logger.info(f"Initializing Vertex AI client (project: {project}, location: {location})")
-                v_client = genai.Client(vertexai=True, project=project, location=location)
+                v_client = genai.Client(
+                    vertexai=True,
+                    project=project,
+                    location=location,
+                    http_options=types.HttpOptions(timeout=120.0),
+                )
                 clients.append(v_client)
             except Exception as e:
                 logger.warning(f"Could not initialize Vertex AI client: {e}")
@@ -92,7 +97,7 @@ def create_genai_clients(preferred_key: Optional[str] = None) -> List[genai.Clie
     keys = [preferred_key] if preferred_key else get_gemini_api_keys()
     for k in keys:
         try:
-            clients.append(genai.Client(api_key=k))
+            clients.append(genai.Client(api_key=k, http_options=types.HttpOptions(timeout=120.0)))
         except Exception as e:
             logger.warning(f"Could not initialize API key client: {e}")
 

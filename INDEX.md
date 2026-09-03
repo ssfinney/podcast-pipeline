@@ -1,8 +1,8 @@
 # Christ Chapel Podcast Archive Master Index
 
-- **Total Cataloged Episodes:** 25
-- **Successfully Processed & Trimmed:** 25
-- **Last Updated:** 2026-09-02 22:27:58
+- **Total Cataloged Episodes:** 28
+- **Successfully Processed & Trimmed:** 28
+- **Last Updated:** 2026-09-02 22:49:07
 
 | # | Date | Sermon Title | Primary Speaker | Service Length | Preaching Segment | Status | Transcript | Preaching Audio |
 |---|---|---|---|---|---|---|---|---|
@@ -31,3 +31,6 @@
 | 23 | **2026-03-29** | Created for Good Works | John C. Wood | 1:30:00 | `00:32:00` → `01:20:00` | ✅ SUCCESS | [2026-03-29 - Created for Good Works.md](ProcessedMD/2026-03-29 - Created for Good Works.md) | [2026-03-29 - Created for Good Works - Preaching.mp3](TrimmedAudio/2026-03-29 - Created for Good Works - Preaching.mp3) |
 | 24 | **2026-03-22** | People of the Christ, Not the Crowd | John C. Wood | 1:30:00 | `00:46:25` → `01:33:02` | ✅ SUCCESS | [2026-03-22 - People of the Christ, Not the Crowd.md](ProcessedMD/2026-03-22 - People of the Christ, Not the Crowd.md) | [2026-03-22 - People of the Christ, Not the Crowd - Preaching.mp3](TrimmedAudio/2026-03-22 - People of the Christ, Not the Crowd - Preaching.mp3) |
 | 25 | **2026-03-15** | It's Time to Wake Up | Nick Gilchrist | 1:30:00 | `00:39:22` → `01:14:30` | ✅ SUCCESS | [2026-03-15 - It's Time to Wake Up.md](ProcessedMD/2026-03-15 - It's Time to Wake Up.md) | [2026-03-15 - It's Time to Wake Up - Preaching.mp3](TrimmedAudio/2026-03-15 - It's Time to Wake Up - Preaching.mp3) |
+| 26 | **2026-03-08** | American Gospel: The Final Chapter | Jason Braddock | 1:30:00 | `00:59:30` → `01:11:06` | ✅ SUCCESS | [2026-03-08 - American Gospel- The Final Chapter.md](ProcessedMD/2026-03-08 - American Gospel- The Final Chapter.md) | [2026-03-08 - American Gospel- The Final Chapter - Preaching.mp3](TrimmedAudio/2026-03-08 - American Gospel- The Final Chapter - Preaching.mp3) |
+| 27 | **2026-03-01** | The Doctrine of Christianity | John C. Wood | 1:30:00 | `00:29:27` → `01:16:00` | ✅ SUCCESS | [2026-03-01 - The Doctrine of Christianity.md](ProcessedMD/2026-03-01 - The Doctrine of Christianity.md) | [2026-03-01 - The Doctrine of Christianity - Preaching.mp3](TrimmedAudio/2026-03-01 - The Doctrine of Christianity - Preaching.mp3) |
+| 28 | **2026-02-22** | The Gospel of Christ | John C. Wood | 1:30:00 | `00:40:55` → `01:31:42` | ✅ SUCCESS | [2026-02-22 - The Gospel of Christ.md](ProcessedMD/2026-02-22 - The Gospel of Christ.md) | [2026-02-22 - The Gospel of Christ - Preaching.mp3](TrimmedAudio/2026-02-22 - The Gospel of Christ - Preaching.mp3) |

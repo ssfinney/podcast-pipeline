@@ -104,9 +104,18 @@ class PodcastPipeline:
         return {}
 
     def _save_manifest(self):
-        """Atomically persist manifest.json to prevent corruption on interruption."""
+        """Atomically persist manifest.json and merge with on-disk state to prevent multi-process overwrites."""
         tmp_path = MANIFEST_PATH.with_suffix(".tmp.json")
         try:
+            on_disk: Dict[str, dict] = {}
+            if MANIFEST_PATH.exists():
+                try:
+                    with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
+                        on_disk = json.load(f)
+                except Exception:
+                    pass
+            on_disk.update(self.manifest)
+            self.manifest = on_disk
             with open(tmp_path, "w", encoding="utf-8") as f:
                 json.dump(self.manifest, f, indent=2, ensure_ascii=False)
             os.replace(tmp_path, MANIFEST_PATH)
