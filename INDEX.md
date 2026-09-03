@@ -1,8 +1,8 @@
 # Christ Chapel Podcast Archive Master Index
 
 - **Total Cataloged Episodes:** 100
-- **Successfully Processed & Trimmed:** 99
-- **Last Updated:** 2026-09-03 06:09:53
+- **Successfully Processed & Trimmed:** 100
+- **Last Updated:** 2026-09-03 06:21:22
 
 | # | Date | Sermon Title | Primary Speaker | Service Length | Preaching Segment | Status | Transcript | Preaching Audio |
 |---|---|---|---|---|---|---|---|---|
@@ -66,7 +66,7 @@
 | 58 | **2025-07-27** | Introducing Jesus (Part 8): My Healer | Jason Braddock | 1:30:00 | `00:55:22` → `01:36:03` | ✅ SUCCESS | [2025-07-27 - Introducing Jesus (Part 8)- My Healer.md](ProcessedMD/2025-07-27 - Introducing Jesus (Part 8)- My Healer.md) | [2025-07-27 - Introducing Jesus (Part 8)- My Healer - Preaching.mp3](TrimmedAudio/2025-07-27 - Introducing Jesus (Part 8)- My Healer - Preaching.mp3) |
 | 59 | **2025-07-20** | Introducing Jesus (Part 7): The Missionary | Jason Braddock | 1:30:00 | `00:54:32` → `01:28:40` | ✅ SUCCESS | [2025-07-20 - Introducing Jesus (Part 7)- The Missionary.md](ProcessedMD/2025-07-20 - Introducing Jesus (Part 7)- The Missionary.md) | [2025-07-20 - Introducing Jesus (Part 7)- The Missionary - Preaching.mp3](TrimmedAudio/2025-07-20 - Introducing Jesus (Part 7)- The Missionary - Preaching.mp3) |
 | 60 | **2025-07-13** | Sparring Partner | Lee McBride | 1:30:00 | `00:40:00` → `01:17:15` | ✅ SUCCESS | [2025-07-13 - Sparring Partner.md](ProcessedMD/2025-07-13 - Sparring Partner.md) | [2025-07-13 - Sparring Partner - Preaching.mp3](TrimmedAudio/2025-07-13 - Sparring Partner - Preaching.mp3) |
-| 61 | **2025-07-06** | Introducing Jesus (Part 6): My Priority | John C. Wood | 1:30:00 | `00:00:00` → `End` | ⚠️ FAILED | [2025-07-06 - Introducing Jesus (Part 6)- My Priority.md](ProcessedMD/2025-07-06 - Introducing Jesus (Part 6)- My Priority.md) | N/A |
+| 61 | **2025-07-06** | Introducing Jesus (Part 6): My Priority | Jason Braddock | 1:30:00 | `00:56:00` → `01:14:59` | ✅ SUCCESS | [2025-07-06 - Introducing Jesus (Part 6)- My Priority.md](ProcessedMD/2025-07-06 - Introducing Jesus (Part 6)- My Priority.md) | [2025-07-06 - Introducing Jesus (Part 6)- My Priority - Preaching.mp3](TrimmedAudio/2025-07-06 - Introducing Jesus (Part 6)- My Priority - Preaching.mp3) |
 | 62 | **2025-06-29** | Introducing Jesus (Part 5): The True Teacher | Jason Braddock | 1:30:00 | `00:38:37` → `01:21:05` | ✅ SUCCESS | [2025-06-29 - Introducing Jesus (Part 5)- The True Teacher.md](ProcessedMD/2025-06-29 - Introducing Jesus (Part 5)- The True Teacher.md) | [2025-06-29 - Introducing Jesus (Part 5)- The True Teacher - Preaching.mp3](TrimmedAudio/2025-06-29 - Introducing Jesus (Part 5)- The True Teacher - Preaching.mp3) |
 | 63 | **2025-06-22** | Introducing Jesus (Part 4): The Revealed Messiah | Jason Braddock | 1:30:00 | `00:42:00` → `01:19:53` | ✅ SUCCESS | [2025-06-22 - Introducing Jesus (Part 4)- The Revealed Messiah.md](ProcessedMD/2025-06-22 - Introducing Jesus (Part 4)- The Revealed Messiah.md) | [2025-06-22 - Introducing Jesus (Part 4)- The Revealed Messiah - Preaching.mp3](TrimmedAudio/2025-06-22 - Introducing Jesus (Part 4)- The Revealed Messiah - Preaching.mp3) |
 | 64 | **2025-06-15** | Introducing Jesus (Part 3): The King of Kings | Jason Braddock | 1:30:00 | `00:33:31` → `01:17:22` | ✅ SUCCESS | [2025-06-15 - Introducing Jesus (Part 3)- The King of Kings.md](ProcessedMD/2025-06-15 - Introducing Jesus (Part 3)- The King of Kings.md) | [2025-06-15 - Introducing Jesus (Part 3)- The King of Kings - Preaching.mp3](TrimmedAudio/2025-06-15 - Introducing Jesus (Part 3)- The King of Kings - Preaching.mp3) |

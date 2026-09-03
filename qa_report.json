@@ -1,5 +1,99 @@
 [
   {
+    "filename": "2024-11-03 - I Am Christ Chapel- Mike Benson.md",
+    "date_iso": "2024-11-03",
+    "title": "I Am Christ Chapel: Mike Benson",
+    "status": "WARN",
+    "raw_audio_size_mb": 43.42,
+    "raw_duration_s": 5691.1,
+    "trimmed_audio_size_mb": 41.93,
+    "trimmed_duration_s": 5496.0,
+    "sermon_ratio": 0.97,
+    "word_count": 21323,
+    "prosody_stress_count": 2713,
+    "prosody_tag_count": 76,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 43.42 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 94.9m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (41.93 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Sermon length is very long: 91.6m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Sermon takes 96.6% of total service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 160270 chars (21323 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 2713 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 76 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 214 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
     "filename": "2024-11-10 - What Am I Going To Do.md",
     "date_iso": "2024-11-10",
     "title": "What Am I Going To Do?",
@@ -3550,6 +3644,100 @@
         "passed": true,
         "severity": "INFO",
         "message": "Found 102 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-07-06 - Introducing Jesus (Part 6)- My Priority.md",
+    "date_iso": "2025-07-06",
+    "title": "Introducing Jesus (Part 6): My Priority",
+    "status": "PASS",
+    "raw_audio_size_mb": 38.45,
+    "raw_duration_s": 5039.2,
+    "trimmed_audio_size_mb": 8.69,
+    "trimmed_duration_s": 1139.0,
+    "sermon_ratio": 0.23,
+    "word_count": 11999,
+    "prosody_stress_count": 183,
+    "prosody_tag_count": 29,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 38.45 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 84.0m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (8.69 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 19.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 22.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 61389 chars (11999 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 183 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 29 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 55 speaker timestamp headings."
       },
       {
         "check_name": "NO_REPETITION_LOOPS",
