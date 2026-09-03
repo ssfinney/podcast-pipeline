@@ -1,5 +1,5833 @@
 [
   {
+    "filename": "2024-11-10 - What Am I Going To Do.md",
+    "date_iso": "2024-11-10",
+    "title": "What Am I Going To Do?",
+    "status": "PASS",
+    "raw_audio_size_mb": 36.89,
+    "raw_duration_s": 4835.4,
+    "trimmed_audio_size_mb": 19.34,
+    "trimmed_duration_s": 2535.3,
+    "sermon_ratio": 0.52,
+    "word_count": 12030,
+    "prosody_stress_count": 565,
+    "prosody_tag_count": 76,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.89 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 80.6m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (19.34 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 42.3m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 52.4% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 62070 chars (12030 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 565 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 76 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 107 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2024-11-17 - What of Your Heart- Part 1- The Hard Heart.md",
+    "date_iso": "2024-11-17",
+    "title": "What of Your Heart? Part 1: The Hard Heart",
+    "status": "WARN",
+    "raw_audio_size_mb": 39.61,
+    "raw_duration_s": 5191.6,
+    "trimmed_audio_size_mb": 19.48,
+    "trimmed_duration_s": 2552.5,
+    "sermon_ratio": 0.49,
+    "word_count": 12564,
+    "prosody_stress_count": 633,
+    "prosody_tag_count": 152,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.61 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 86.5m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (19.48 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 42.5m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 49.2% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 64196 chars (12564 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 633 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 152 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 128 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'i wouldn t be a man' repeated 86 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2024-11-24 - What of Your Heart- Part 2- The Grateful Heart.md",
+    "date_iso": "2024-11-24",
+    "title": "What of Your Heart? Part 2: The Grateful Heart",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.22,
+    "raw_duration_s": 5271.7,
+    "trimmed_audio_size_mb": 19.67,
+    "trimmed_duration_s": 2578.0,
+    "sermon_ratio": 0.49,
+    "word_count": 29141,
+    "prosody_stress_count": 597,
+    "prosody_tag_count": 59,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.22 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 87.9m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (19.67 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 43.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 48.9% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 182339 chars (29141 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 597 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 59 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 2865 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2024-12-01 - I Am Christ Chapel- Tess Harper.md",
+    "date_iso": "2024-12-01",
+    "title": "I Am Christ Chapel: Tess Harper",
+    "status": "WARN",
+    "raw_audio_size_mb": 39.39,
+    "raw_duration_s": 5162.5,
+    "trimmed_audio_size_mb": 18.98,
+    "trimmed_duration_s": 2488.0,
+    "sermon_ratio": 0.48,
+    "word_count": 53225,
+    "prosody_stress_count": 2116,
+    "prosody_tag_count": 1176,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.39 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 86.0m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (18.98 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 41.5m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 48.2% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 290399 chars (53225 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 2116 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 1176 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 311 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 1448 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2024-12-08 - The Joy of Being Found.md",
+    "date_iso": "2024-12-08",
+    "title": "The Joy of Being Found",
+    "status": "PASS",
+    "raw_audio_size_mb": 36.33,
+    "raw_duration_s": 4761.7,
+    "trimmed_audio_size_mb": 20.29,
+    "trimmed_duration_s": 2658.6,
+    "sermon_ratio": 0.56,
+    "word_count": 11341,
+    "prosody_stress_count": 607,
+    "prosody_tag_count": 21,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.33 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 79.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (20.29 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 44.3m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 55.8% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 60365 chars (11341 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 607 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 21 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 35 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2024-12-15 - Stand.md",
+    "date_iso": "2024-12-15",
+    "title": "Stand",
+    "status": "PASS",
+    "raw_audio_size_mb": 39.19,
+    "raw_duration_s": 5136.3,
+    "trimmed_audio_size_mb": 20.25,
+    "trimmed_duration_s": 2654.2,
+    "sermon_ratio": 0.52,
+    "word_count": 13557,
+    "prosody_stress_count": 432,
+    "prosody_tag_count": 46,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.19 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 85.6m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (20.25 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 44.2m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 51.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 68619 chars (13557 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 432 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 46 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 72 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2024-12-22 - The Hidden Gems of Christmas.md",
+    "date_iso": "2024-12-22",
+    "title": "The Hidden Gems of Christmas",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.91,
+    "raw_duration_s": 5362.0,
+    "trimmed_audio_size_mb": 18.23,
+    "trimmed_duration_s": 2389.0,
+    "sermon_ratio": 0.45,
+    "word_count": 22547,
+    "prosody_stress_count": 235,
+    "prosody_tag_count": 26,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.91 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 89.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (18.23 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 39.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 44.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 146810 chars (22547 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 235 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 26 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 147 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2024-12-29 - Share the Gospel.md",
+    "date_iso": "2024-12-29",
+    "title": "Share the Gospel",
+    "status": "WARN",
+    "raw_audio_size_mb": 36.48,
+    "raw_duration_s": 4780.9,
+    "trimmed_audio_size_mb": 16.29,
+    "trimmed_duration_s": 2135.0,
+    "sermon_ratio": 0.45,
+    "word_count": 42478,
+    "prosody_stress_count": 552,
+    "prosody_tag_count": 42,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.48 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 79.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (16.29 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 35.6m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 44.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 182253 chars (42478 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 552 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 42 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 34 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 10830 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-01-05 - Battling Drift (Part 1)- Relational Drift.md",
+    "date_iso": "2025-01-05",
+    "title": "Battling Drift (Part 1): Relational Drift",
+    "status": "WARN",
+    "raw_audio_size_mb": 38.97,
+    "raw_duration_s": 5107.9,
+    "trimmed_audio_size_mb": 17.28,
+    "trimmed_duration_s": 2265.0,
+    "sermon_ratio": 0.44,
+    "word_count": 11100,
+    "prosody_stress_count": 449,
+    "prosody_tag_count": 84,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 38.97 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 85.1m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.28 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 44.3% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 56862 chars (11100 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 449 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 84 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 53 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'jing jing jing' repeated 172 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-01-12 - Battling Drift (Part 2)- Missional Drift.md",
+    "date_iso": "2025-01-12",
+    "title": "Battling Drift (Part 2): Missional Drift",
+    "status": "PASS",
+    "raw_audio_size_mb": 37.22,
+    "raw_duration_s": 4878.1,
+    "trimmed_audio_size_mb": 17.75,
+    "trimmed_duration_s": 2326.0,
+    "sermon_ratio": 0.48,
+    "word_count": 11966,
+    "prosody_stress_count": 624,
+    "prosody_tag_count": 69,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.22 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 81.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.75 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 38.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 47.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 62980 chars (11966 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 624 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 69 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 124 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-01-19 - Battling Drift (Part 3)- This Glorious Gospel.md",
+    "date_iso": "2025-01-19",
+    "title": "Battling Drift (Part 3): This Glorious Gospel",
+    "status": "PASS",
+    "raw_audio_size_mb": 34.77,
+    "raw_duration_s": 4557.3,
+    "trimmed_audio_size_mb": 15.95,
+    "trimmed_duration_s": 2090.0,
+    "sermon_ratio": 0.46,
+    "word_count": 11125,
+    "prosody_stress_count": 700,
+    "prosody_tag_count": 56,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 34.77 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 76.0m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (15.95 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 34.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 45.9% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 58729 chars (11125 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 700 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 56 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 132 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-01-26 - January 26, 2025.md",
+    "date_iso": "2025-01-26",
+    "title": "January 26, 2025",
+    "status": "WARN",
+    "raw_audio_size_mb": 39.54,
+    "raw_duration_s": 5182.4,
+    "trimmed_audio_size_mb": 11.9,
+    "trimmed_duration_s": 1560.0,
+    "sermon_ratio": 0.3,
+    "word_count": 13245,
+    "prosody_stress_count": 396,
+    "prosody_tag_count": 68,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.54 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 86.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (11.90 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 26.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 30.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 67728 chars (13245 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 396 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 68 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 389 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 262 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-02-02 - Disciple the Found.md",
+    "date_iso": "2025-02-02",
+    "title": "Disciple the Found",
+    "status": "PASS",
+    "raw_audio_size_mb": 20.02,
+    "raw_duration_s": 2623.9,
+    "trimmed_audio_size_mb": 17.35,
+    "trimmed_duration_s": 2274.0,
+    "sermon_ratio": 0.87,
+    "word_count": 7676,
+    "prosody_stress_count": 311,
+    "prosody_tag_count": 60,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 20.02 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 43.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.35 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.9m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 86.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 40399 chars (7676 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 311 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 60 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 20 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-02-09 - The Last 30 Years.md",
+    "date_iso": "2025-02-09",
+    "title": "The Last 30 Years",
+    "status": "WARN",
+    "raw_audio_size_mb": 47.7,
+    "raw_duration_s": 6251.6,
+    "trimmed_audio_size_mb": 17.01,
+    "trimmed_duration_s": 2229.0,
+    "sermon_ratio": 0.36,
+    "word_count": 111746,
+    "prosody_stress_count": 659,
+    "prosody_tag_count": 110,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 47.70 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 104.2m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.01 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.2m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 35.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 551381 chars (111746 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 659 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 110 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 65 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'thanks i give' repeated 27 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-02-16 - Battling Drift (Part 4)- Mend the Broken.md",
+    "date_iso": "2025-02-16",
+    "title": "Battling Drift (Part 4): Mend the Broken",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.59,
+    "raw_duration_s": 5319.7,
+    "trimmed_audio_size_mb": 15.96,
+    "trimmed_duration_s": 2092.0,
+    "sermon_ratio": 0.39,
+    "word_count": 12632,
+    "prosody_stress_count": 532,
+    "prosody_tag_count": 93,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.59 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 88.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (15.96 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 34.9m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 39.3% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 67865 chars (12632 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 532 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 93 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 55 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-02-16 - Revelation (Part 1).md",
+    "date_iso": "2025-02-16",
+    "title": "Revelation (Part 1)",
+    "status": "PASS",
+    "raw_audio_size_mb": 38.58,
+    "raw_duration_s": 5056.2,
+    "trimmed_audio_size_mb": 20.14,
+    "trimmed_duration_s": 2640.0,
+    "sermon_ratio": 0.52,
+    "word_count": 12918,
+    "prosody_stress_count": 359,
+    "prosody_tag_count": 47,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 38.58 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 84.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (20.14 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 44.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 52.2% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 67163 chars (12918 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 359 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 47 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 147 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-02-23 - Missionary Justin Gilpin.md",
+    "date_iso": "2025-02-23",
+    "title": "Missionary Justin Gilpin",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.48,
+    "raw_duration_s": 5305.9,
+    "trimmed_audio_size_mb": 13.54,
+    "trimmed_duration_s": 1775.0,
+    "sermon_ratio": 0.33,
+    "word_count": 14133,
+    "prosody_stress_count": 449,
+    "prosody_tag_count": 41,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.48 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 88.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (13.54 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 29.6m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 33.5% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 70875 chars (14133 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 449 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 41 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 164 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-02-23 - Revelation (Part 2).md",
+    "date_iso": "2025-02-23",
+    "title": "Revelation (Part 2)",
+    "status": "WARN",
+    "raw_audio_size_mb": 30.97,
+    "raw_duration_s": 4058.6,
+    "trimmed_audio_size_mb": 30.79,
+    "trimmed_duration_s": 4036.0,
+    "sermon_ratio": 0.99,
+    "word_count": 11589,
+    "prosody_stress_count": 470,
+    "prosody_tag_count": 29,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 30.97 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 67.6m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (30.79 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 67.3m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Sermon takes 99.4% of total service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 61019 chars (11589 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 470 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 29 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 60 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-03-02 - I Am Sent.md",
+    "date_iso": "2025-03-02",
+    "title": "I Am Sent",
+    "status": "PASS",
+    "raw_audio_size_mb": 37.88,
+    "raw_duration_s": 4964.7,
+    "trimmed_audio_size_mb": 16.1,
+    "trimmed_duration_s": 2110.0,
+    "sermon_ratio": 0.43,
+    "word_count": 12913,
+    "prosody_stress_count": 987,
+    "prosody_tag_count": 92,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.88 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 82.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (16.10 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 35.2m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 42.5% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 68222 chars (12913 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 987 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 92 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 65 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-03-09 - Battling Drift- The Call.md",
+    "date_iso": "2025-03-09",
+    "title": "Battling Drift: The Call",
+    "status": "PASS",
+    "raw_audio_size_mb": 36.3,
+    "raw_duration_s": 4757.4,
+    "trimmed_audio_size_mb": 20.52,
+    "trimmed_duration_s": 2690.0,
+    "sermon_ratio": 0.57,
+    "word_count": 11226,
+    "prosody_stress_count": 991,
+    "prosody_tag_count": 55,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.30 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 79.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (20.52 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 44.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 56.5% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 59894 chars (11226 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 991 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 55 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 35 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-03-09 - Revelation (Part 3).md",
+    "date_iso": "2025-03-09",
+    "title": "Revelation (Part 3)",
+    "status": "PASS",
+    "raw_audio_size_mb": 31.13,
+    "raw_duration_s": 4080.7,
+    "trimmed_audio_size_mb": 23.42,
+    "trimmed_duration_s": 3070.0,
+    "sermon_ratio": 0.75,
+    "word_count": 17981,
+    "prosody_stress_count": 697,
+    "prosody_tag_count": 28,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 31.13 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 68.0m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (23.42 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 51.2m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 75.2% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 143325 chars (17981 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 697 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 28 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 61 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-03-23 - Revelation (Part 4).md",
+    "date_iso": "2025-03-23",
+    "title": "Revelation (Part 4)",
+    "status": "WARN",
+    "raw_audio_size_mb": 30.85,
+    "raw_duration_s": 4043.8,
+    "trimmed_audio_size_mb": 30.12,
+    "trimmed_duration_s": 3948.0,
+    "sermon_ratio": 0.98,
+    "word_count": 11297,
+    "prosody_stress_count": 687,
+    "prosody_tag_count": 35,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 30.85 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 67.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (30.12 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 65.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Sermon takes 97.6% of total service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 62743 chars (11297 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 687 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 35 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 88 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-03-23 - The Buoyancy of the Believer.md",
+    "date_iso": "2025-03-23",
+    "title": "The Buoyancy of the Believer",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.88,
+    "raw_duration_s": 5357.8,
+    "trimmed_audio_size_mb": 23.54,
+    "trimmed_duration_s": 3085.0,
+    "sermon_ratio": 0.58,
+    "word_count": 12925,
+    "prosody_stress_count": 238,
+    "prosody_tag_count": 78,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.88 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 89.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (23.54 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 51.4m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 57.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 64800 chars (12925 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 238 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 78 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 207 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-03-23 - The Irrevocable Csll.md",
+    "date_iso": "2025-03-23",
+    "title": "The Irrevocable Csll",
+    "status": "PASS",
+    "raw_audio_size_mb": 46.94,
+    "raw_duration_s": 6152.6,
+    "trimmed_audio_size_mb": 27.97,
+    "trimmed_duration_s": 3666.0,
+    "sermon_ratio": 0.6,
+    "word_count": 63656,
+    "prosody_stress_count": 909,
+    "prosody_tag_count": 73,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 46.94 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 102.5m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (27.97 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 61.1m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 59.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 279533 chars (63656 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 909 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 73 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 74 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-03-30 - The Glorious Appearing.md",
+    "date_iso": "2025-03-30",
+    "title": "The Glorious Appearing",
+    "status": "PASS",
+    "raw_audio_size_mb": 38.13,
+    "raw_duration_s": 4997.8,
+    "trimmed_audio_size_mb": 15.3,
+    "trimmed_duration_s": 2005.0,
+    "sermon_ratio": 0.4,
+    "word_count": 11427,
+    "prosody_stress_count": 989,
+    "prosody_tag_count": 49,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 38.13 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 83.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (15.30 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 33.4m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 40.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 61498 chars (11427 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 989 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 49 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 54 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-04-06 - I Am Christ Chapel - Eric Lamey.md",
+    "date_iso": "2025-04-06",
+    "title": "I Am Christ Chapel - Eric Lamey",
+    "status": "PASS",
+    "raw_audio_size_mb": 32.11,
+    "raw_duration_s": 4208.0,
+    "trimmed_audio_size_mb": 13.65,
+    "trimmed_duration_s": 1789.0,
+    "sermon_ratio": 0.43,
+    "word_count": 14841,
+    "prosody_stress_count": 415,
+    "prosody_tag_count": 46,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 32.11 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 70.1m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (13.65 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 29.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 42.5% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 130644 chars (14841 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 415 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 46 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 168 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-04-13 - Those Who Leave the Father's House.md",
+    "date_iso": "2025-04-13",
+    "title": "Those Who Leave the Father's House",
+    "status": "WARN",
+    "raw_audio_size_mb": 37.38,
+    "raw_duration_s": 4899.0,
+    "trimmed_audio_size_mb": 15.48,
+    "trimmed_duration_s": 2028.8,
+    "sermon_ratio": 0.41,
+    "word_count": 12995,
+    "prosody_stress_count": 748,
+    "prosody_tag_count": 78,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.38 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 81.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (15.48 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 33.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 41.4% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 68106 chars (12995 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 748 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 78 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 230 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'hallelujah i m so blessed' repeated 190 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-04-20 - The Resurrection and the Responses.md",
+    "date_iso": "2025-04-20",
+    "title": "The Resurrection and the Responses",
+    "status": "PASS",
+    "raw_audio_size_mb": 39.24,
+    "raw_duration_s": 5142.7,
+    "trimmed_audio_size_mb": 20.49,
+    "trimmed_duration_s": 2686.0,
+    "sermon_ratio": 0.52,
+    "word_count": 11280,
+    "prosody_stress_count": 657,
+    "prosody_tag_count": 83,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.24 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 85.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (20.49 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 44.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 52.2% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 58920 chars (11280 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 657 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 83 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 54 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-04-27 - The Greatest Commandment.md",
+    "date_iso": "2025-04-27",
+    "title": "The Greatest Commandment",
+    "status": "PASS",
+    "raw_audio_size_mb": 36.19,
+    "raw_duration_s": 4743.0,
+    "trimmed_audio_size_mb": 17.82,
+    "trimmed_duration_s": 2336.0,
+    "sermon_ratio": 0.49,
+    "word_count": 11864,
+    "prosody_stress_count": 528,
+    "prosody_tag_count": 47,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.19 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 79.1m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.82 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 38.9m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 49.3% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 60902 chars (11864 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 528 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 47 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 88 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-05-04 - By God's Grace.md",
+    "date_iso": "2025-05-04",
+    "title": "By God's Grace",
+    "status": "PASS",
+    "raw_audio_size_mb": 38.81,
+    "raw_duration_s": 5087.3,
+    "trimmed_audio_size_mb": 16.25,
+    "trimmed_duration_s": 2130.1,
+    "sermon_ratio": 0.42,
+    "word_count": 12047,
+    "prosody_stress_count": 914,
+    "prosody_tag_count": 107,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 38.81 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 84.8m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (16.25 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 35.5m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 41.9% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 64255 chars (12047 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 914 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 107 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 96 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-05-11 - Desperate Believers.md",
+    "date_iso": "2025-05-11",
+    "title": "Desperate Believers",
+    "status": "PASS",
+    "raw_audio_size_mb": 33.88,
+    "raw_duration_s": 4440.7,
+    "trimmed_audio_size_mb": 16.94,
+    "trimmed_duration_s": 2220.6,
+    "sermon_ratio": 0.5,
+    "word_count": 10021,
+    "prosody_stress_count": 464,
+    "prosody_tag_count": 20,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 33.88 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 74.0m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (16.94 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 50.0% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 51733 chars (10021 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 464 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 20 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 129 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-05-18 - I Am Reserved.md",
+    "date_iso": "2025-05-18",
+    "title": "I Am Reserved",
+    "status": "PASS",
+    "raw_audio_size_mb": 37.02,
+    "raw_duration_s": 4852.7,
+    "trimmed_audio_size_mb": 15.7,
+    "trimmed_duration_s": 2058.0,
+    "sermon_ratio": 0.42,
+    "word_count": 60991,
+    "prosody_stress_count": 496,
+    "prosody_tag_count": 80,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.02 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 80.9m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (15.70 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 34.3m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 42.4% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 318408 chars (60991 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 496 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 80 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 511 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-05-25 - First Means First.md",
+    "date_iso": "2025-05-25",
+    "title": "First Means First",
+    "status": "WARN",
+    "raw_audio_size_mb": 38.93,
+    "raw_duration_s": 5102.4,
+    "trimmed_audio_size_mb": 18.56,
+    "trimmed_duration_s": 2432.0,
+    "sermon_ratio": 0.48,
+    "word_count": 75877,
+    "prosody_stress_count": 372,
+    "prosody_tag_count": 36,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 38.93 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 85.0m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (18.56 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 40.5m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 47.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 316806 chars (75877 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 372 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 36 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 229 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 10571 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-06-01 - Introducing Jesus- The Word of God.md",
+    "date_iso": "2025-06-01",
+    "title": "Introducing Jesus: The Word of God",
+    "status": "PASS",
+    "raw_audio_size_mb": 33.0,
+    "raw_duration_s": 4324.7,
+    "trimmed_audio_size_mb": 17.81,
+    "trimmed_duration_s": 2334.0,
+    "sermon_ratio": 0.54,
+    "word_count": 10578,
+    "prosody_stress_count": 727,
+    "prosody_tag_count": 101,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 33.00 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 72.1m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.81 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 38.9m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 54.0% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 56257 chars (10578 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 727 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 101 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 65 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-06-08 - Introducing Jesus (Part 2)- The Lamb of God.md",
+    "date_iso": "2025-06-08",
+    "title": "Introducing Jesus (Part 2): The Lamb of God",
+    "status": "PASS",
+    "raw_audio_size_mb": 37.05,
+    "raw_duration_s": 4855.7,
+    "trimmed_audio_size_mb": 13.57,
+    "trimmed_duration_s": 1779.0,
+    "sermon_ratio": 0.37,
+    "word_count": 12440,
+    "prosody_stress_count": 846,
+    "prosody_tag_count": 23,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.05 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 80.9m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (13.57 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 29.7m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 36.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 65392 chars (12440 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 846 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 23 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 43 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-06-15 - Introducing Jesus (Part 3)- The King of Kings.md",
+    "date_iso": "2025-06-15",
+    "title": "Introducing Jesus (Part 3): The King of Kings",
+    "status": "PASS",
+    "raw_audio_size_mb": 35.42,
+    "raw_duration_s": 4642.1,
+    "trimmed_audio_size_mb": 20.07,
+    "trimmed_duration_s": 2631.0,
+    "sermon_ratio": 0.57,
+    "word_count": 11529,
+    "prosody_stress_count": 525,
+    "prosody_tag_count": 92,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 35.42 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 77.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (20.07 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 43.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 56.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 60322 chars (11529 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 525 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 92 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 71 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-06-22 - Introducing Jesus (Part 4)- The Revealed Messiah.md",
+    "date_iso": "2025-06-22",
+    "title": "Introducing Jesus (Part 4): The Revealed Messiah",
+    "status": "PASS",
+    "raw_audio_size_mb": 38.46,
+    "raw_duration_s": 5041.5,
+    "trimmed_audio_size_mb": 17.34,
+    "trimmed_duration_s": 2273.0,
+    "sermon_ratio": 0.45,
+    "word_count": 15157,
+    "prosody_stress_count": 515,
+    "prosody_tag_count": 41,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 38.46 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 84.0m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.34 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.9m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 45.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 78206 chars (15157 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 515 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 41 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 60 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-06-29 - Introducing Jesus (Part 5)- The True Teacher.md",
+    "date_iso": "2025-06-29",
+    "title": "Introducing Jesus (Part 5): The True Teacher",
+    "status": "PASS",
+    "raw_audio_size_mb": 37.32,
+    "raw_duration_s": 4891.4,
+    "trimmed_audio_size_mb": 19.44,
+    "trimmed_duration_s": 2548.0,
+    "sermon_ratio": 0.52,
+    "word_count": 13868,
+    "prosody_stress_count": 768,
+    "prosody_tag_count": 66,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.32 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 81.5m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (19.44 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 42.5m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 52.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 74210 chars (13868 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 768 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 66 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 102 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-07-13 - Sparring Partner.md",
+    "date_iso": "2025-07-13",
+    "title": "Sparring Partner",
+    "status": "PASS",
+    "raw_audio_size_mb": 39.45,
+    "raw_duration_s": 5170.1,
+    "trimmed_audio_size_mb": 17.05,
+    "trimmed_duration_s": 2235.0,
+    "sermon_ratio": 0.43,
+    "word_count": 13519,
+    "prosody_stress_count": 751,
+    "prosody_tag_count": 159,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.45 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 86.2m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.05 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.3m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 43.2% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 71212 chars (13519 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 751 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 159 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 214 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-07-20 - Introducing Jesus (Part 7)- The Missionary.md",
+    "date_iso": "2025-07-20",
+    "title": "Introducing Jesus (Part 7): The Missionary",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.68,
+    "raw_duration_s": 5332.0,
+    "trimmed_audio_size_mb": 15.63,
+    "trimmed_duration_s": 2048.0,
+    "sermon_ratio": 0.38,
+    "word_count": 14346,
+    "prosody_stress_count": 489,
+    "prosody_tag_count": 56,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.68 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 88.9m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (15.63 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 34.1m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 38.4% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 74657 chars (14346 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 489 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 56 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 117 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-07-27 - Introducing Jesus (Part 8)- My Healer.md",
+    "date_iso": "2025-07-27",
+    "title": "Introducing Jesus (Part 8): My Healer",
+    "status": "WARN",
+    "raw_audio_size_mb": 45.37,
+    "raw_duration_s": 5946.3,
+    "trimmed_audio_size_mb": 18.62,
+    "trimmed_duration_s": 2441.0,
+    "sermon_ratio": 0.41,
+    "word_count": 46475,
+    "prosody_stress_count": 431,
+    "prosody_tag_count": 27,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 45.37 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 99.1m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (18.62 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 40.7m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 41.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 198771 chars (46475 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 431 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 27 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 116 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 10765 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-08-03 - Introducing Jesus (Part 9)- Son of God - My Friend.md",
+    "date_iso": "2025-08-03",
+    "title": "Introducing Jesus (Part 9): Son of God - My Friend",
+    "status": "PASS",
+    "raw_audio_size_mb": 36.93,
+    "raw_duration_s": 4840.2,
+    "trimmed_audio_size_mb": 17.71,
+    "trimmed_duration_s": 2321.0,
+    "sermon_ratio": 0.48,
+    "word_count": 11721,
+    "prosody_stress_count": 678,
+    "prosody_tag_count": 18,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.93 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 80.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.71 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 38.7m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 48.0% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 61089 chars (11721 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 678 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 18 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 34 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-08-10 - Christ's Mighty Baptism.md",
+    "date_iso": "2025-08-10",
+    "title": "Christ's Mighty Baptism",
+    "status": "PASS",
+    "raw_audio_size_mb": 37.85,
+    "raw_duration_s": 4961.1,
+    "trimmed_audio_size_mb": 14.95,
+    "trimmed_duration_s": 1959.0,
+    "sermon_ratio": 0.39,
+    "word_count": 13673,
+    "prosody_stress_count": 258,
+    "prosody_tag_count": 69,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.85 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 82.7m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (14.95 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 32.7m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 39.5% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 74208 chars (13673 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 258 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 69 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 200 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-08-17 - Our Service Unto the Lord.md",
+    "date_iso": "2025-08-17",
+    "title": "Our Service Unto the Lord",
+    "status": "WARN",
+    "raw_audio_size_mb": 37.62,
+    "raw_duration_s": 4931.4,
+    "trimmed_audio_size_mb": 9.83,
+    "trimmed_duration_s": 1288.5,
+    "sermon_ratio": 0.26,
+    "word_count": 71244,
+    "prosody_stress_count": 324,
+    "prosody_tag_count": 88,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.62 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 82.2m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (9.83 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 21.5m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 26.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 547403 chars (71244 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 324 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 88 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 111 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'sound of child screaming' repeated 10576 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-08-24 - I Am Christ Chapel - Blake Joyce.md",
+    "date_iso": "2025-08-24",
+    "title": "I Am Christ Chapel - Blake Joyce",
+    "status": "WARN",
+    "raw_audio_size_mb": 36.81,
+    "raw_duration_s": 4824.0,
+    "trimmed_audio_size_mb": 21.54,
+    "trimmed_duration_s": 2823.0,
+    "sermon_ratio": 0.59,
+    "word_count": 21803,
+    "prosody_stress_count": 323,
+    "prosody_tag_count": 2017,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.81 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 80.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (21.54 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 47.1m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 58.5% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 146775 chars (21803 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 323 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 2017 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 89 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase '2m33s22ms 2m33s22ms pause 1 5s' repeated 2002 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-08-31 - Prayers that Resonate.md",
+    "date_iso": "2025-08-31",
+    "title": "Prayers that Resonate",
+    "status": "PASS",
+    "raw_audio_size_mb": 36.78,
+    "raw_duration_s": 4820.7,
+    "trimmed_audio_size_mb": 18.76,
+    "trimmed_duration_s": 2459.0,
+    "sermon_ratio": 0.51,
+    "word_count": 11823,
+    "prosody_stress_count": 508,
+    "prosody_tag_count": 131,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.78 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 80.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (18.76 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 41.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 51.0% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 60325 chars (11823 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 508 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 131 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 71 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-09-07 - When the Free are Bound.md",
+    "date_iso": "2025-09-07",
+    "title": "When the Free are Bound",
+    "status": "PASS",
+    "raw_audio_size_mb": 39.51,
+    "raw_duration_s": 5178.5,
+    "trimmed_audio_size_mb": 21.89,
+    "trimmed_duration_s": 2869.0,
+    "sermon_ratio": 0.55,
+    "word_count": 11051,
+    "prosody_stress_count": 208,
+    "prosody_tag_count": 38,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.51 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 86.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (21.89 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 47.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 55.4% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 56179 chars (11051 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 208 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 38 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 25 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-09-14 - Living In, By, and For the Truth.md",
+    "date_iso": "2025-09-14",
+    "title": "Living In, By, and For the Truth",
+    "status": "PASS",
+    "raw_audio_size_mb": 28.04,
+    "raw_duration_s": 3675.8,
+    "trimmed_audio_size_mb": 17.19,
+    "trimmed_duration_s": 2253.0,
+    "sermon_ratio": 0.61,
+    "word_count": 9724,
+    "prosody_stress_count": 709,
+    "prosody_tag_count": 36,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 28.04 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 61.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.19 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.5m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 61.3% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 50472 chars (9724 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 709 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 36 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 42 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-09-21 - Be Bold.md",
+    "date_iso": "2025-09-21",
+    "title": "Be Bold",
+    "status": "WARN",
+    "raw_audio_size_mb": 33.35,
+    "raw_duration_s": 4370.7,
+    "trimmed_audio_size_mb": 18.11,
+    "trimmed_duration_s": 2374.0,
+    "sermon_ratio": 0.54,
+    "word_count": 42936,
+    "prosody_stress_count": 700,
+    "prosody_tag_count": 29,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 33.35 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 72.8m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (18.11 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 39.6m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 54.3% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 186006 chars (42936 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 700 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 29 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 98 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 10764 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-09-28 - For Those Who Live With Great Pain.md",
+    "date_iso": "2025-09-28",
+    "title": "For Those Who Live With Great Pain",
+    "status": "WARN",
+    "raw_audio_size_mb": 45.13,
+    "raw_duration_s": 5915.5,
+    "trimmed_audio_size_mb": 22.43,
+    "trimmed_duration_s": 2940.0,
+    "sermon_ratio": 0.5,
+    "word_count": 80580,
+    "prosody_stress_count": 708,
+    "prosody_tag_count": 3704,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 45.13 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 98.6m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (22.43 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 49.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 49.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 420953 chars (80580 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 708 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 3704 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 3714 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'i am free' repeated 12797 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-10-05 - Your Expectation of God.md",
+    "date_iso": "2025-10-05",
+    "title": "Your Expectation of God",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.45,
+    "raw_duration_s": 5302.3,
+    "trimmed_audio_size_mb": 18.86,
+    "trimmed_duration_s": 2472.0,
+    "sermon_ratio": 0.47,
+    "word_count": 13328,
+    "prosody_stress_count": 753,
+    "prosody_tag_count": 69,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.45 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 88.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (18.86 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 41.2m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 46.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 69211 chars (13328 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 753 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 69 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 227 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-10-12 - Navigating Bad News.md",
+    "date_iso": "2025-10-12",
+    "title": "Navigating Bad News",
+    "status": "WARN",
+    "raw_audio_size_mb": 39.43,
+    "raw_duration_s": 5168.7,
+    "trimmed_audio_size_mb": 19.56,
+    "trimmed_duration_s": 2564.0,
+    "sermon_ratio": 0.5,
+    "word_count": 15161,
+    "prosody_stress_count": 206,
+    "prosody_tag_count": 150,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.43 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 86.1m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (19.56 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 42.7m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 49.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 76605 chars (15161 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 206 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 150 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 50 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'amen amen amen' repeated 638 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-10-19 - The Revealing Nature of Our Storms.md",
+    "date_iso": "2025-10-19",
+    "title": "The Revealing Nature of Our Storms",
+    "status": "PASS",
+    "raw_audio_size_mb": 40.19,
+    "raw_duration_s": 5267.4,
+    "trimmed_audio_size_mb": 23.2,
+    "trimmed_duration_s": 3040.3,
+    "sermon_ratio": 0.58,
+    "word_count": 13586,
+    "prosody_stress_count": 1052,
+    "prosody_tag_count": 149,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 40.19 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 87.8m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (23.20 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 50.7m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 57.7% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 72062 chars (13586 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 1052 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 149 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 104 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-10-26 - Blinded by the god of theis world.md",
+    "date_iso": "2025-10-26",
+    "title": "Blinded by the god of theis world",
+    "status": "PASS",
+    "raw_audio_size_mb": 35.21,
+    "raw_duration_s": 4615.3,
+    "trimmed_audio_size_mb": 19.14,
+    "trimmed_duration_s": 2508.0,
+    "sermon_ratio": 0.54,
+    "word_count": 10583,
+    "prosody_stress_count": 843,
+    "prosody_tag_count": 76,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 35.21 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 76.9m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (19.14 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 41.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 54.3% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 55570 chars (10583 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 843 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 76 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 30 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-11-02 - As They Went.md",
+    "date_iso": "2025-11-02",
+    "title": "As They Went",
+    "status": "PASS",
+    "raw_audio_size_mb": 41.16,
+    "raw_duration_s": 5395.3,
+    "trimmed_audio_size_mb": 19.73,
+    "trimmed_duration_s": 2586.0,
+    "sermon_ratio": 0.48,
+    "word_count": 12358,
+    "prosody_stress_count": 503,
+    "prosody_tag_count": 73,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 41.16 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 89.9m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (19.73 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 43.1m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 47.9% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 64751 chars (12358 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 503 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 73 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 29 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-11-09 - Prove It.md",
+    "date_iso": "2025-11-09",
+    "title": "Prove It",
+    "status": "PASS",
+    "raw_audio_size_mb": 41.77,
+    "raw_duration_s": 5474.6,
+    "trimmed_audio_size_mb": 16.94,
+    "trimmed_duration_s": 2220.0,
+    "sermon_ratio": 0.41,
+    "word_count": 13729,
+    "prosody_stress_count": 1033,
+    "prosody_tag_count": 45,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 41.77 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 91.2m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (16.94 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.0m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 40.6% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 71924 chars (13729 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 1033 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 45 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 198 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-11-16 - Bridging the Gap (Part 1)- Be Aware of the Gap.md",
+    "date_iso": "2025-11-16",
+    "title": "Bridging the Gap (Part 1): Be Aware of the Gap",
+    "status": "PASS",
+    "raw_audio_size_mb": 36.66,
+    "raw_duration_s": 4805.2,
+    "trimmed_audio_size_mb": 21.91,
+    "trimmed_duration_s": 2872.0,
+    "sermon_ratio": 0.6,
+    "word_count": 12079,
+    "prosody_stress_count": 375,
+    "prosody_tag_count": 41,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 36.66 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 80.1m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (21.91 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 47.9m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 59.8% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 62472 chars (12079 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 375 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 41 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 37 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-11-23 - Bridging the Gap (Part 2)- Practice Discipleship.md",
+    "date_iso": "2025-11-23",
+    "title": "Bridging the Gap (Part 2): Practice Discipleship",
+    "status": "WARN",
+    "raw_audio_size_mb": 39.18,
+    "raw_duration_s": 5135.7,
+    "trimmed_audio_size_mb": 17.21,
+    "trimmed_duration_s": 2255.6,
+    "sermon_ratio": 0.44,
+    "word_count": 46564,
+    "prosody_stress_count": 11853,
+    "prosody_tag_count": 54,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.18 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 85.6m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.21 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 37.6m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 43.9% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 251410 chars (46564 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 11853 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 54 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 275 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'i was made for more' repeated 5662 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-11-30 - Bridging the Gap (Part 3)- Pass the Baton.md",
+    "date_iso": "2025-11-30",
+    "title": "Bridging the Gap (Part 3): Pass the Baton",
+    "status": "WARN",
+    "raw_audio_size_mb": 37.21,
+    "raw_duration_s": 4877.2,
+    "trimmed_audio_size_mb": 21.63,
+    "trimmed_duration_s": 2835.0,
+    "sermon_ratio": 0.58,
+    "word_count": 12530,
+    "prosody_stress_count": 724,
+    "prosody_tag_count": 40,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 37.21 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 81.3m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (21.63 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 47.3m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 58.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 67078 chars (12530 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 724 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 40 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 79 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 21 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-12-07 - A Legacy of Gratitude.md",
+    "date_iso": "2025-12-07",
+    "title": "A Legacy of Gratitude",
+    "status": "WARN",
+    "raw_audio_size_mb": 39.57,
+    "raw_duration_s": 5186.7,
+    "trimmed_audio_size_mb": 9.07,
+    "trimmed_duration_s": 1189.0,
+    "sermon_ratio": 0.23,
+    "word_count": 34965,
+    "prosody_stress_count": 840,
+    "prosody_tag_count": 30,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 39.57 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 86.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (9.07 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 19.8m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 22.9% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 193313 chars (34965 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 840 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 30 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 3679 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'soft piano music' repeated 404 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-12-14 - What Of Your Faith.md",
+    "date_iso": "2025-12-14",
+    "title": "What Of Your Faith?",
+    "status": "WARN",
+    "raw_audio_size_mb": 32.75,
+    "raw_duration_s": 4293.1,
+    "trimmed_audio_size_mb": 17.45,
+    "trimmed_duration_s": 2287.0,
+    "sermon_ratio": 0.53,
+    "word_count": 41599,
+    "prosody_stress_count": 284,
+    "prosody_tag_count": 129,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 32.75 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 71.6m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (17.45 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 38.1m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 53.3% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 241984 chars (41599 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 284 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 129 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 160 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'mary mary mary' repeated 10825 times in paragraph"
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2025-12-21 - Christmas and Trusting God.md",
+    "date_iso": "2025-12-21",
+    "title": "Christmas and Trusting God",
+    "status": "PASS",
+    "raw_audio_size_mb": 32.24,
+    "raw_duration_s": 4226.1,
+    "trimmed_audio_size_mb": 14.48,
+    "trimmed_duration_s": 1898.0,
+    "sermon_ratio": 0.45,
+    "word_count": 13069,
+    "prosody_stress_count": 401,
+    "prosody_tag_count": 35,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 32.24 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 70.4m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (14.48 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 31.6m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 44.9% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 68765 chars (13069 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 401 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 35 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 48 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
     "filename": "2025-12-28 - Finish the Year With Confidence.md",
     "date_iso": "2025-12-28",
     "title": "Finish the Year With Confidence",

@@ -250,7 +250,7 @@ def download_audio(
 
     t0 = time.time()
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=600)
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=1800)
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
         if tmp_path.exists():
             tmp_path.unlink()
@@ -269,7 +269,7 @@ def download_audio(
             episode.media_url,
         ]
         try:
-            subprocess.run(yt_cmd, capture_output=True, text=True, check=True, timeout=600)
+            subprocess.run(yt_cmd, capture_output=True, text=True, check=True, timeout=1800)
         except (OSError, subprocess.SubprocessError) as yt_err:
             for stray in audio_dir.glob(f"{tmp_path.stem}.*"):
                 stray.unlink(missing_ok=True)
