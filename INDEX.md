@@ -1,8 +1,8 @@
 # Christ Chapel Podcast Archive Master Index
 
-- **Total Cataloged Episodes:** 28
-- **Successfully Processed & Trimmed:** 28
-- **Last Updated:** 2026-09-02 22:49:07
+- **Total Cataloged Episodes:** 36
+- **Successfully Processed & Trimmed:** 36
+- **Last Updated:** 2026-09-02 23:23:20
 
 | # | Date | Sermon Title | Primary Speaker | Service Length | Preaching Segment | Status | Transcript | Preaching Audio |
 |---|---|---|---|---|---|---|---|---|
@@ -34,3 +34,11 @@
 | 26 | **2026-03-08** | American Gospel: The Final Chapter | Jason Braddock | 1:30:00 | `00:59:30` → `01:11:06` | ✅ SUCCESS | [2026-03-08 - American Gospel- The Final Chapter.md](ProcessedMD/2026-03-08 - American Gospel- The Final Chapter.md) | [2026-03-08 - American Gospel- The Final Chapter - Preaching.mp3](TrimmedAudio/2026-03-08 - American Gospel- The Final Chapter - Preaching.mp3) |
 | 27 | **2026-03-01** | The Doctrine of Christianity | John C. Wood | 1:30:00 | `00:29:27` → `01:16:00` | ✅ SUCCESS | [2026-03-01 - The Doctrine of Christianity.md](ProcessedMD/2026-03-01 - The Doctrine of Christianity.md) | [2026-03-01 - The Doctrine of Christianity - Preaching.mp3](TrimmedAudio/2026-03-01 - The Doctrine of Christianity - Preaching.mp3) |
 | 28 | **2026-02-22** | The Gospel of Christ | John C. Wood | 1:30:00 | `00:40:55` → `01:31:42` | ✅ SUCCESS | [2026-02-22 - The Gospel of Christ.md](ProcessedMD/2026-02-22 - The Gospel of Christ.md) | [2026-02-22 - The Gospel of Christ - Preaching.mp3](TrimmedAudio/2026-02-22 - The Gospel of Christ - Preaching.mp3) |
+| 29 | **2026-02-15** | The Crucified Christ | John C. Wood | 1:30:00 | `00:48:00` → `01:32:25` | ✅ SUCCESS | [2026-02-15 - The Crucified Christ.md](ProcessedMD/2026-02-15 - The Crucified Christ.md) | [2026-02-15 - The Crucified Christ - Preaching.mp3](TrimmedAudio/2026-02-15 - The Crucified Christ - Preaching.mp3) |
+| 30 | **2026-02-08** | The Attributes of God | John C. Wood | 1:30:00 | `00:58:08` → `01:32:38` | ✅ SUCCESS | [2026-02-08 - The Attributes of God.md](ProcessedMD/2026-02-08 - The Attributes of God.md) | [2026-02-08 - The Attributes of God - Preaching.mp3](TrimmedAudio/2026-02-08 - The Attributes of God - Preaching.mp3) |
+| 31 | **2026-02-01** | The Emergent Gospel | John C. Wood | 1:30:00 | `00:52:40` → `01:35:22` | ✅ SUCCESS | [2026-02-01 - The Emergent Gospel.md](ProcessedMD/2026-02-01 - The Emergent Gospel.md) | [2026-02-01 - The Emergent Gospel - Preaching.mp3](TrimmedAudio/2026-02-01 - The Emergent Gospel - Preaching.mp3) |
+| 32 | **2026-01-25** | Confident in His Timing | John C. Wood | 1:30:00 | `00:35:00` → `01:20:30` | ✅ SUCCESS | [2026-01-25 - Confident in His Timing.md](ProcessedMD/2026-01-25 - Confident in His Timing.md) | [2026-01-25 - Confident in His Timing - Preaching.mp3](TrimmedAudio/2026-01-25 - Confident in His Timing - Preaching.mp3) |
+| 33 | **2026-01-18** | The Lord Is My Shepherd | Jason Braddock | 1:30:00 | `00:31:50` → `01:12:37` | ✅ SUCCESS | [2026-01-18 - The Lord Is My Shepherd.md](ProcessedMD/2026-01-18 - The Lord Is My Shepherd.md) | [2026-01-18 - The Lord Is My Shepherd - Preaching.mp3](TrimmedAudio/2026-01-18 - The Lord Is My Shepherd - Preaching.mp3) |
+| 34 | **2026-01-11** | Confident in His Leading | John C. Wood | 1:30:00 | `00:39:50` → `01:14:22` | ✅ SUCCESS | [2026-01-11 - Confident in His Leading.md](ProcessedMD/2026-01-11 - Confident in His Leading.md) | [2026-01-11 - Confident in His Leading - Preaching.mp3](TrimmedAudio/2026-01-11 - Confident in His Leading - Preaching.mp3) |
+| 35 | **2026-01-04** | Confident in His Supply | John C. Wood | 1:30:00 | `00:38:41` → `01:17:03` | ✅ SUCCESS | [2026-01-04 - Confident in His Supply.md](ProcessedMD/2026-01-04 - Confident in His Supply.md) | [2026-01-04 - Confident in His Supply - Preaching.mp3](TrimmedAudio/2026-01-04 - Confident in His Supply - Preaching.mp3) |
+| 36 | **2025-12-28** | Finish the Year With Confidence | John C. Wood | 1:30:00 | `00:32:40` → `01:08:22` | ✅ SUCCESS | [2025-12-28 - Finish the Year With Confidence.md](ProcessedMD/2025-12-28 - Finish the Year With Confidence.md) | [2025-12-28 - Finish the Year With Confidence - Preaching.mp3](TrimmedAudio/2025-12-28 - Finish the Year With Confidence - Preaching.mp3) |
