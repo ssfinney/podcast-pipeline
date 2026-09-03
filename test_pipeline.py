@@ -84,8 +84,8 @@ def test_transcript_validation_flow(tmp_path, monkeypatch):
 
 def test_audit_transcript_parses_json_and_records_model(monkeypatch, tmp_path):
     transcriber = ProsodyTranscriber.__new__(ProsodyTranscriber)
+    transcriber.preferred_model = "gemini-3.7-flash"
     transcriber.last_model_used = "gemini-3.7-flash"
-
     def fake_transcribe(audio_path, prompt, preferred_model, max_model_retries):
         assert preferred_model == "gemini-3.7-flash"
         return "```json\n{\"needs_reprocess\": true, \"confidence\": 0.9, \"issues\": [\"omission\"]}\n```"

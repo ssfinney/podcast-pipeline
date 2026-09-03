@@ -28,16 +28,15 @@ static_ffmpeg.add_paths()
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# Model preference order: favor the latest available 3.7 Flash model, then stable
-# Flash fallbacks before the lower-cost lite models and Pro preview.
+# Model preference order for Vertex AI and Developer API
 DEFAULT_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-3.8-flash",
     "gemini-3.7-flash",
-    "gemini-3.1-pro-preview",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
-    "gemini-3-flash-preview",
     "gemini-3.1-flash-lite",
-    "gemini-3.1-flash-lite-preview",
 ]
 
 PROSODY_TRANSCRIPTION_PROMPT = """Transcribe the audio verbatim while capturing full vocal prosody, emotion, and cadence:
@@ -73,18 +72,21 @@ def create_genai_clients(preferred_key: Optional[str] = None) -> List[genai.Clie
     """Create a list of genai.Client instances supporting both Vertex AI and API keys."""
     clients: List[genai.Client] = []
 
-    # 1. Check Vertex AI service account / project mode
+    # 1. Check Vertex AI service account / project mode (consumes Google Developer Program credits)
     cred_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     project = os.getenv("VERTEX_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCLOUD_PROJECT") or "omp-gemini-507412"
     location = os.getenv("VERTEX_LOCATION", "us-central1")
 
-    if cred_file and Path(cred_file).exists():
-        try:
-            logger.info(f"Initializing Vertex AI client with credentials: {cred_file} (project: {project})")
-            v_client = genai.Client(vertexai=True, project=project, location=location)
-            clients.append(v_client)
-        except Exception as e:
-            logger.warning(f"Could not initialize Vertex AI client: {e}")
+    if cred_file:
+        expanded_cred = os.path.expanduser(cred_file)
+        if Path(expanded_cred).exists():
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = expanded_cred
+            try:
+                logger.info(f"Initializing Vertex AI client (project: {project}, location: {location})")
+                v_client = genai.Client(vertexai=True, project=project, location=location)
+                clients.append(v_client)
+            except Exception as e:
+                logger.warning(f"Could not initialize Vertex AI client: {e}")
 
     # 2. Add API key clients
     keys = [preferred_key] if preferred_key else get_gemini_api_keys()
@@ -155,7 +157,7 @@ class ProsodyTranscriber:
 
     def __init__(self, api_key: Optional[str] = None, preferred_model: Optional[str] = None):
         self.clients = create_genai_clients(preferred_key=api_key)
-        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
+        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         self.last_model_used: Optional[str] = None
 
     @property
@@ -185,7 +187,7 @@ class ProsodyTranscriber:
         max_model_retries: int = 5,
     ) -> str:
         """
-        Generate prosody transcription for an audio file/chunk with serialized upload, key rotation, and parallel inference.
+        Generate prosody transcription for an audio file/chunk with fast Vertex AI inline bytes, key rotation, and parallel inference.
         """
         models_to_try = []
         pref = preferred_model or self.preferred_model
@@ -199,13 +201,21 @@ class ProsodyTranscriber:
 
         # Iterate across available clients (Vertex AI first, then API keys)
         for client_idx, client in enumerate(self.clients):
+            is_vertex = getattr(client, "vertexai", False)
             uploaded_file = None
+            audio_content = None
+
             try:
+                # On Vertex AI, pass audio bytes directly (fast, zero upload/delete overhead)
+                if is_vertex:
+                    audio_bytes = file_path.read_bytes()
+                    audio_content = types.Part.from_bytes(data=audio_bytes, mime_type="audio/mp3")
+
                 for model_name in models_to_try:
                     for attempt in range(1, max_model_retries + 1):
                         try:
-                            # Serialize file uploads to avoid bandwidth congestion
-                            if not uploaded_file:
+                            # On Developer API keys, upload remote file
+                            if not is_vertex and not uploaded_file:
                                 with _UPLOAD_LOCK:
                                     logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB) via Client {client_idx+1}...")
                                     uploaded_file = client.files.upload(file=str(file_path))
@@ -220,11 +230,13 @@ class ProsodyTranscriber:
                                 if uploaded_file.state.name != "ACTIVE":
                                     raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
 
-                            logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (Client {client_idx+1}, attempt {attempt}/{max_model_retries})...")
+                            payload_content = audio_content if is_vertex else uploaded_file
+                            client_label = "Vertex AI" if is_vertex else f"Key {client_idx+1}"
+                            logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' ({client_label}, attempt {attempt}/{max_model_retries})...")
                             t0 = time.time()
                             response = client.models.generate_content(
                                 model=model_name,
-                                contents=[uploaded_file, prompt],
+                                contents=[payload_content, prompt],
                                 config=types.GenerateContentConfig(
                                     temperature=0.2,
                                     automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
@@ -242,8 +254,12 @@ class ProsodyTranscriber:
                             err_str = str(e)
                             last_error = e
 
+                            # 404 Model not supported on this endpoint (e.g. Vertex vs Studio): skip model immediately
+                            if "404" in err_str or "NOT_FOUND" in err_str or "not found" in err_str.lower():
+                                break
+
                             # Key disabled, permission denied, credits depleted, or upload rate limited: advance immediately to next client
-                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str or "depleted" in err_str.lower() or "billing" in err_str.lower() or (not uploaded_file and ("429" in err_str or "RESOURCE_EXHAUSTED" in err_str)):
+                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str or "depleted" in err_str.lower() or "billing" in err_str.lower() or (not is_vertex and not uploaded_file and ("429" in err_str or "RESOURCE_EXHAUSTED" in err_str)):
                                 logger.warning(f"Client {client_idx+1} hit upload/auth/quota error ({err_str[:80]}...). Advancing immediately to next client.")
                                 if uploaded_file and uploaded_file.name:
                                     try:
@@ -251,10 +267,10 @@ class ProsodyTranscriber:
                                     except Exception:
                                         pass
                                 uploaded_file = None
-                                break  # Break model retry loop to advance to next client
+                                break
 
-                            if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
-                                logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
+                            if "limit: 0" in err_str:
+                                logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota. Skipping model.")
                                 break
                             elif any(k in err_str.lower() for k in ("503", "unavailable", "timeout", "handshake", "ssl", "errno 8", "nodename", "servname", "getaddrinfo", "connection", "remote end closed", "unreachable")):
                                 wait_s = min(60, attempt * 8)
@@ -275,7 +291,7 @@ class ProsodyTranscriber:
                                 time.sleep(5)
 
                     # If client was disabled/blocked/throttled on upload, jump to next client
-                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error) or "depleted" in str(last_error).lower() or not uploaded_file:
+                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error) or "depleted" in str(last_error).lower() or (not is_vertex and not uploaded_file):
                         break
 
             finally:
@@ -293,9 +309,9 @@ class ProsodyTranscriber:
         existing_transcript: str,
         max_model_retries: int = 1,
     ) -> dict:
-        """Have Gemini 3.7 Flash assess an existing transcript against its source audio."""
+        """Have Gemini assess an existing transcript against its source audio."""
         prompt = f"""Audit the existing podcast transcript against the attached source audio.
-Use Gemini 3.7 Flash for this audit. Do not rewrite the transcript.
+Do not rewrite the transcript.
 
 Return one JSON object only:
 {{
@@ -322,7 +338,7 @@ Existing transcript:
         raw = self._transcribe_single_file(
             audio_path,
             prompt,
-            preferred_model="gemini-3.7-flash",
+            preferred_model=self.preferred_model,
             max_model_retries=max_model_retries,
         ).strip()
         raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.DOTALL).strip()
