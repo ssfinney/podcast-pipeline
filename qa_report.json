@@ -1,5 +1,193 @@
 [
   {
+    "filename": "2026-03-15 - It's Time to Wake Up.md",
+    "date_iso": "2026-03-15",
+    "title": "It's Time to Wake Up",
+    "status": "PASS",
+    "raw_audio_size_mb": 34.1,
+    "raw_duration_s": 4469.3,
+    "trimmed_audio_size_mb": 16.08,
+    "trimmed_duration_s": 2107.1,
+    "sermon_ratio": 0.47,
+    "word_count": 11662,
+    "prosody_stress_count": 523,
+    "prosody_tag_count": 31,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 34.10 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 74.5m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (16.08 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 35.1m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 47.1% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 59446 chars (11662 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 523 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 31 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 188 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
+    "filename": "2026-03-22 - People of the Christ, Not the Crowd.md",
+    "date_iso": "2026-03-22",
+    "title": "People of the Christ, Not the Crowd",
+    "status": "PASS",
+    "raw_audio_size_mb": 42.84,
+    "raw_duration_s": 5615.6,
+    "trimmed_audio_size_mb": 21.34,
+    "trimmed_duration_s": 2796.9,
+    "sermon_ratio": 0.5,
+    "word_count": 16383,
+    "prosody_stress_count": 595,
+    "prosody_tag_count": 118,
+    "checks": [
+      {
+        "check_name": "RAW_AUDIO_SIZE",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Raw audio size: 42.84 MB."
+      },
+      {
+        "check_name": "RAW_AUDIO_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Service duration: 93.6m."
+      },
+      {
+        "check_name": "TRIMMED_AUDIO_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio exists (21.34 MB)."
+      },
+      {
+        "check_name": "PREACHING_DURATION",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon length: 46.6m."
+      },
+      {
+        "check_name": "SERMON_RATIO",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Sermon ratio: 49.8% of service."
+      },
+      {
+        "check_name": "TRANSCRIPT_EXISTS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript size: 96520 chars (16383 words)."
+      },
+      {
+        "check_name": "FRONTMATTER_VALID",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Valid YAML frontmatter present."
+      },
+      {
+        "check_name": "PROSODY_STRESS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 595 vocal stress emphasis tags."
+      },
+      {
+        "check_name": "PROSODY_TAGS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 118 inline prosody/cadence tags."
+      },
+      {
+        "check_name": "SPEAKER_TIMESTAMPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Found 204 speaker timestamp headings."
+      },
+      {
+        "check_name": "NO_REPETITION_LOOPS",
+        "passed": true,
+        "severity": "INFO",
+        "message": "No repetition loops detected."
+      },
+      {
+        "check_name": "DRIVE_TRANSCRIPT_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Transcript synced to Google Drive."
+      },
+      {
+        "check_name": "DRIVE_AUDIO_SYNC",
+        "passed": true,
+        "severity": "INFO",
+        "message": "Trimmed audio synced to Google Drive."
+      }
+    ]
+  },
+  {
     "filename": "2026-03-29 - Created for Good Works.md",
     "date_iso": "2026-03-29",
     "title": "Created for Good Works",
@@ -2071,15 +2259,15 @@
     "filename": "2026-08-30 - The Healing Properties of Psalm 23 (Part 5)- Paths of Righteousness.md",
     "date_iso": "2026-08-30",
     "title": "The Healing Properties of Psalm 23 (Part 5): Paths of Righteousness",
-    "status": "PASS",
+    "status": "WARN",
     "raw_audio_size_mb": 42.92,
     "raw_duration_s": 5625.0,
-    "trimmed_audio_size_mb": 15.64,
-    "trimmed_duration_s": 2050.0,
-    "sermon_ratio": 0.36,
-    "word_count": 12730,
-    "prosody_stress_count": 425,
-    "prosody_tag_count": 304,
+    "trimmed_audio_size_mb": 18.64,
+    "trimmed_duration_s": 2443.0,
+    "sermon_ratio": 0.43,
+    "word_count": 29720,
+    "prosody_stress_count": 978,
+    "prosody_tag_count": 72,
     "checks": [
       {
         "check_name": "RAW_AUDIO_SIZE",
@@ -2097,25 +2285,25 @@
         "check_name": "TRIMMED_AUDIO_EXISTS",
         "passed": true,
         "severity": "INFO",
-        "message": "Trimmed audio exists (15.64 MB)."
+        "message": "Trimmed audio exists (18.64 MB)."
       },
       {
         "check_name": "PREACHING_DURATION",
         "passed": true,
         "severity": "INFO",
-        "message": "Sermon length: 34.2m."
+        "message": "Sermon length: 40.7m."
       },
       {
         "check_name": "SERMON_RATIO",
         "passed": true,
         "severity": "INFO",
-        "message": "Sermon ratio: 36.4% of service."
+        "message": "Sermon ratio: 43.4% of service."
       },
       {
         "check_name": "TRANSCRIPT_EXISTS",
         "passed": true,
         "severity": "INFO",
-        "message": "Transcript size: 64874 chars (12730 words)."
+        "message": "Transcript size: 136888 chars (29720 words)."
       },
       {
         "check_name": "FRONTMATTER_VALID",
@@ -2127,25 +2315,25 @@
         "check_name": "PROSODY_STRESS",
         "passed": true,
         "severity": "INFO",
-        "message": "Found 425 vocal stress emphasis tags."
+        "message": "Found 978 vocal stress emphasis tags."
       },
       {
         "check_name": "PROSODY_TAGS",
         "passed": true,
         "severity": "INFO",
-        "message": "Found 304 inline prosody/cadence tags."
+        "message": "Found 72 inline prosody/cadence tags."
       },
       {
         "check_name": "SPEAKER_TIMESTAMPS",
         "passed": true,
         "severity": "INFO",
-        "message": "Found 129 speaker timestamp headings."
+        "message": "Found 83 speaker timestamp headings."
       },
       {
         "check_name": "NO_REPETITION_LOOPS",
-        "passed": true,
-        "severity": "INFO",
-        "message": "No repetition loops detected."
+        "passed": false,
+        "severity": "WARNING",
+        "message": "Hallucination loop: Consecutive phrase 'oh oh oh' repeated 4674 times in paragraph"
       },
       {
         "check_name": "DRIVE_TRANSCRIPT_SYNC",

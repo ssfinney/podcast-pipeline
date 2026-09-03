@@ -1,8 +1,8 @@
 # Christ Chapel Podcast Archive Master Index
 
-- **Total Cataloged Episodes:** 23
-- **Successfully Processed & Trimmed:** 23
-- **Last Updated:** 2026-09-02 22:16:59
+- **Total Cataloged Episodes:** 25
+- **Successfully Processed & Trimmed:** 25
+- **Last Updated:** 2026-09-02 22:27:58
 
 | # | Date | Sermon Title | Primary Speaker | Service Length | Preaching Segment | Status | Transcript | Preaching Audio |
 |---|---|---|---|---|---|---|---|---|
@@ -29,3 +29,5 @@
 | 21 | **2026-04-12** | Israel | Amy Bilsland and Kelly Wood | 1:30:00 | `00:39:45` → `01:30:00` | ✅ SUCCESS | [2026-04-12 - Israel.md](ProcessedMD/2026-04-12 - Israel.md) | [2026-04-12 - Israel - Preaching.mp3](TrimmedAudio/2026-04-12 - Israel - Preaching.mp3) |
 | 22 | **2026-04-05** | In the Likeness of His Resurrection | John C. Wood | 1:30:00 | `00:24:00` → `01:04:00` | ✅ SUCCESS | [2026-04-05 - In the Likeness of His Resurrection.md](ProcessedMD/2026-04-05 - In the Likeness of His Resurrection.md) | [2026-04-05 - In the Likeness of His Resurrection - Preaching.mp3](TrimmedAudio/2026-04-05 - In the Likeness of His Resurrection - Preaching.mp3) |
 | 23 | **2026-03-29** | Created for Good Works | John C. Wood | 1:30:00 | `00:32:00` → `01:20:00` | ✅ SUCCESS | [2026-03-29 - Created for Good Works.md](ProcessedMD/2026-03-29 - Created for Good Works.md) | [2026-03-29 - Created for Good Works - Preaching.mp3](TrimmedAudio/2026-03-29 - Created for Good Works - Preaching.mp3) |
+| 24 | **2026-03-22** | People of the Christ, Not the Crowd | John C. Wood | 1:30:00 | `00:46:25` → `01:33:02` | ✅ SUCCESS | [2026-03-22 - People of the Christ, Not the Crowd.md](ProcessedMD/2026-03-22 - People of the Christ, Not the Crowd.md) | [2026-03-22 - People of the Christ, Not the Crowd - Preaching.mp3](TrimmedAudio/2026-03-22 - People of the Christ, Not the Crowd - Preaching.mp3) |
+| 25 | **2026-03-15** | It's Time to Wake Up | Nick Gilchrist | 1:30:00 | `00:39:22` → `01:14:30` | ✅ SUCCESS | [2026-03-15 - It's Time to Wake Up.md](ProcessedMD/2026-03-15 - It's Time to Wake Up.md) | [2026-03-15 - It's Time to Wake Up - Preaching.mp3](TrimmedAudio/2026-03-15 - It's Time to Wake Up - Preaching.mp3) |
