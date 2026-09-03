@@ -81,12 +81,7 @@ def audit_and_reprocess(
     """Audit eligible completed episodes, then reprocess only high-confidence failures."""
     episodes = fetch_episodes(feed_url)
     pipeline = PodcastPipeline(model_name="gemini-3.7-flash")
-    # Bound stalled model requests; a 4-minute request is enough for an audit
-    # response while still allowing the ordered fallback to proceed.
-    pipeline.transcriber.clients = [
-        genai.Client(api_key=k, http_options=types.HttpOptions(timeout=240_000))
-        for k in pipeline.transcriber.api_keys
-    ]
+    # Clients are initialized across Vertex AI and all configured API keys
     eligible = _eligible_episodes(episodes, pipeline)
     if limit > 0:
         eligible = eligible[:limit]
