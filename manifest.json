@@ -2077,5 +2077,26 @@
     "drive_link": "https://drive.google.com/drive/folders/1bGjKB1GcSGIP1ZEpcLzUQPZiEUyDzTtT",
     "transcription_time_s": 162.2,
     "completed_at": "2026-09-03 06:03:16"
+  },
+  "https://s3.amazonaws.com/ccstarchives/xml/1103241": {
+    "index": 100,
+    "guid": "https://s3.amazonaws.com/ccstarchives/xml/1103241",
+    "title": "I Am Christ Chapel: Mike Benson",
+    "date_iso": "2024-11-03",
+    "pub_date": "Sun, 3 November 2024 12:00:00 EST",
+    "duration": "1:16:50",
+    "audio_file": "2024-11-03 - I Am Christ Chapel- Mike Benson.mp3",
+    "audio_size_mb": 43.42,
+    "md_file": "2024-11-03 - I Am Christ Chapel- Mike Benson.md",
+    "status": "SUCCESS",
+    "trimmed_audio_file": "2024-11-03 - I Am Christ Chapel- Mike Benson - Preaching.mp3",
+    "preaching_start": "00:03:15",
+    "preaching_end": "01:34:51",
+    "speaker_name": "John C. Wood",
+    "error": null,
+    "drive_file_id": null,
+    "drive_link": "https://drive.google.com/drive/folders/1bGjKB1GcSGIP1ZEpcLzUQPZiEUyDzTtT",
+    "transcription_time_s": 316.6,
+    "completed_at": "2026-09-03 06:09:53"
   }
 }

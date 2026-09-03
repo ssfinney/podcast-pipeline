@@ -87,7 +87,7 @@ def create_genai_clients(preferred_key: Optional[str] = None) -> List[genai.Clie
                     vertexai=True,
                     project=project,
                     location=location,
-                    http_options=types.HttpOptions(timeout=120.0),
+                    http_options=types.HttpOptions(timeout=180_000),  # 180 seconds in milliseconds
                 )
                 clients.append(v_client)
             except Exception as e:
@@ -97,7 +97,7 @@ def create_genai_clients(preferred_key: Optional[str] = None) -> List[genai.Clie
     keys = [preferred_key] if preferred_key else get_gemini_api_keys()
     for k in keys:
         try:
-            clients.append(genai.Client(api_key=k, http_options=types.HttpOptions(timeout=120.0)))
+            clients.append(genai.Client(api_key=k, http_options=types.HttpOptions(timeout=180_000)))  # 180 seconds
         except Exception as e:
             logger.warning(f"Could not initialize API key client: {e}")
 
