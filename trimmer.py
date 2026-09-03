@@ -109,18 +109,9 @@ class PreachingTrimmer:
     """Detects preaching boundaries and extracts sermon-only audio files."""
 
     def __init__(self, api_key: Optional[str] = None):
-        keys = [api_key] if api_key else []
-        if not keys:
-            for var in ["GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEYS"]:
-                raw = os.getenv(var, "")
-                if raw:
-                    for k in raw.split(","):
-                        k = k.strip()
-                        if k and k not in keys:
-                            keys.append(k)
-        if not keys:
-            raise ValueError("GEMINI_API_KEY is not set.")
-        self.clients = [genai.Client(api_key=k) for k in keys]
+        from transcriber import create_genai_clients
+
+        self.clients = create_genai_clients(preferred_key=api_key)
     def detect_boundaries_from_transcript(
         self,
         transcript_text: str,

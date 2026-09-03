@@ -69,6 +69,36 @@ def get_gemini_api_keys() -> List[str]:
     return keys
 
 
+def create_genai_clients(preferred_key: Optional[str] = None) -> List[genai.Client]:
+    """Create a list of genai.Client instances supporting both Vertex AI and API keys."""
+    clients: List[genai.Client] = []
+
+    # 1. Check Vertex AI service account / project mode
+    cred_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    project = os.getenv("VERTEX_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCLOUD_PROJECT") or "omp-gemini-507412"
+    location = os.getenv("VERTEX_LOCATION", "us-central1")
+
+    if cred_file and Path(cred_file).exists():
+        try:
+            logger.info(f"Initializing Vertex AI client with credentials: {cred_file} (project: {project})")
+            v_client = genai.Client(vertexai=True, project=project, location=location)
+            clients.append(v_client)
+        except Exception as e:
+            logger.warning(f"Could not initialize Vertex AI client: {e}")
+
+    # 2. Add API key clients
+    keys = [preferred_key] if preferred_key else get_gemini_api_keys()
+    for k in keys:
+        try:
+            clients.append(genai.Client(api_key=k))
+        except Exception as e:
+            logger.warning(f"Could not initialize API key client: {e}")
+
+    if not clients:
+        raise ValueError("No valid Gemini API keys or Vertex credentials found in environment.")
+    return clients
+
+
 def format_timestamp(seconds: float) -> str:
     """Format seconds into HH:MM:SS."""
     h = int(seconds // 3600)
@@ -124,10 +154,7 @@ class ProsodyTranscriber:
     """Manages audio upload, Gemini prosody transcription, parallel chunking, caching, and file cleanup."""
 
     def __init__(self, api_key: Optional[str] = None, preferred_model: Optional[str] = None):
-        self.api_keys = [api_key] if api_key else get_gemini_api_keys()
-        if not self.api_keys:
-            raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
-        self.clients = [genai.Client(api_key=k) for k in self.api_keys]
+        self.clients = create_genai_clients(preferred_key=api_key)
         self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
         self.last_model_used: Optional[str] = None
 
@@ -170,8 +197,8 @@ class ProsodyTranscriber:
 
         last_error = None
 
-        # Iterate across available API keys (with primary key first)
-        for key_idx, client in enumerate(self.clients):
+        # Iterate across available clients (Vertex AI first, then API keys)
+        for client_idx, client in enumerate(self.clients):
             uploaded_file = None
             try:
                 for model_name in models_to_try:
@@ -180,7 +207,7 @@ class ProsodyTranscriber:
                             # Serialize file uploads to avoid bandwidth congestion
                             if not uploaded_file:
                                 with _UPLOAD_LOCK:
-                                    logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB) via Key {key_idx+1}...")
+                                    logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB) via Client {client_idx+1}...")
                                     uploaded_file = client.files.upload(file=str(file_path))
 
                                 poll_start = time.time()
@@ -193,7 +220,7 @@ class ProsodyTranscriber:
                                 if uploaded_file.state.name != "ACTIVE":
                                     raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
 
-                            logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (Key {key_idx+1}, attempt {attempt}/{max_model_retries})...")
+                            logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (Client {client_idx+1}, attempt {attempt}/{max_model_retries})...")
                             t0 = time.time()
                             response = client.models.generate_content(
                                 model=model_name,
@@ -215,16 +242,17 @@ class ProsodyTranscriber:
                             err_str = str(e)
                             last_error = e
 
-                            # Key disabled, permission denied, or upload rate limited: advance immediately to next API key
-                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str or (not uploaded_file and ("429" in err_str or "RESOURCE_EXHAUSTED" in err_str)):
-                                logger.warning(f"Key {key_idx+1} hit error during upload/auth ({err_str[:80]}...). Advancing immediately to next key.")
+                            # Key disabled, permission denied, credits depleted, or upload rate limited: advance immediately to next client
+                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str or "depleted" in err_str.lower() or "billing" in err_str.lower() or (not uploaded_file and ("429" in err_str or "RESOURCE_EXHAUSTED" in err_str)):
+                                logger.warning(f"Client {client_idx+1} hit upload/auth/quota error ({err_str[:80]}...). Advancing immediately to next client.")
                                 if uploaded_file and uploaded_file.name:
                                     try:
                                         client.files.delete(name=uploaded_file.name)
                                     except Exception:
                                         pass
                                 uploaded_file = None
-                                break  # Break model retry loop to advance to next key
+                                break  # Break model retry loop to advance to next client
+
                             if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
                                 logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
                                 break
@@ -246,9 +274,10 @@ class ProsodyTranscriber:
                             else:
                                 time.sleep(5)
 
-                    # If key was disabled/blocked/throttled on upload, jump to next key
-                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error) or not uploaded_file:
+                    # If client was disabled/blocked/throttled on upload, jump to next client
+                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error) or "depleted" in str(last_error).lower() or not uploaded_file:
                         break
+
             finally:
                 if uploaded_file and uploaded_file.name:
                     try:
@@ -256,7 +285,7 @@ class ProsodyTranscriber:
                     except Exception as del_err:
                         logger.warning(f"Failed to delete remote file {uploaded_file.name}: {del_err}")
 
-        raise RuntimeError(f"All keys and models failed for {file_path.name}: {last_error}")
+        raise RuntimeError(f"All clients and models failed for {file_path.name}: {last_error}")
 
     def audit_transcript(
         self,
