@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import downloader as downloader_module
 import pipeline as pipeline_module
 from downloader import sanitize_filename
 from pipeline import PodcastPipeline
@@ -20,6 +21,25 @@ def test_sanitize_filename():
     assert "?" not in clean
     assert ":" not in clean
     assert "The Healing Properties" in clean
+
+
+def test_fetch_episodes_preserves_url_resolved_guid(tmp_path, monkeypatch):
+    xml = b"""<?xml version="1.0"?><rss version="2.0"><channel><title>Feed</title><item>
+    <title>Episode</title><guid>1234</guid><pubDate>Sun, 30 August 2026 12:00:00 EST</pubDate>
+    <enclosure url="https://example.com/video.mp4" type="video/mp4"/>
+    </item></channel></rss>"""
+
+    class Response:
+        content = xml
+
+        def raise_for_status(self):
+            return None
+
+    monkeypatch.setattr(downloader_module.requests, "get", lambda *args, **kwargs: Response())
+    monkeypatch.setattr(downloader_module, "FEED_CACHE_PATH", tmp_path / "feed_cache.json")
+
+    episodes = downloader_module.fetch_episodes("https://example.com/xml/feed.xml", max_retries=1)
+    assert episodes[0].guid == "https://example.com/xml/1234"
 
 
 def test_timestamp_conversions():

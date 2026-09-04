@@ -14,6 +14,7 @@ from dataclasses import asdict, dataclass
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import List, Optional
+from urllib.parse import urljoin
 
 import feedparser
 import requests
@@ -126,7 +127,10 @@ def fetch_episodes(feed_url: str = DEFAULT_FEED_URL, max_retries: int = 4) -> Li
     episodes: List[Episode] = []
     for idx, entry in enumerate(feed.entries):
         title = entry.get("title", f"Episode {idx + 1}").strip()
-        guid = entry.get("guid", entry.get("id", f"ep_{idx + 1}"))
+        raw_guid = entry.get("guid", entry.get("id", f"ep_{idx + 1}"))
+        # feedparser resolves relative GUIDs when parsing by URL. Preserve that
+        # stable identity when parsing bounded response bytes instead.
+        guid = urljoin(feed_url, str(raw_guid))
         author = entry.get("author", entry.get("itunes_author", "Unknown Author"))
         summary = entry.get("summary", entry.get("itunes_summary", "")).strip()
         description = entry.get("description", "").strip()

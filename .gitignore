@@ -47,6 +47,7 @@ TrimmedAudio/*.tmp*
 *.tmp
 *.tmp.*
 .chunk_cache_*
+*.lock
 
 # Generated Transcripts & Local Cache
 ProcessedMD/*.md
