@@ -28,16 +28,15 @@ static_ffmpeg.add_paths()
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# Model preference order: favor the available 3.7 Flash model, then stable
-# Flash fallbacks before the lower-cost lite models and Pro preview.
+# Model preference order for Vertex AI and Developer API
 DEFAULT_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-3.8-flash",
     "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
-    "gemini-3-flash-preview",
     "gemini-3.1-flash-lite",
-    "gemini-3.1-flash-lite-preview",
-    "gemini-3.1-pro-preview",
 ]
 
 PROSODY_TRANSCRIPTION_PROMPT = """Transcribe the audio verbatim while capturing full vocal prosody, emotion, and cadence:
@@ -54,6 +53,57 @@ PROSODY_CHUNK_PROMPT = """Transcribe this audio segment verbatim while capturing
 
 # Global lock to serialize audio upload bursts and prevent upstream bandwidth congestion
 _UPLOAD_LOCK = threading.Lock()
+
+
+def get_gemini_api_keys() -> List[str]:
+    """Retrieve all available Gemini API keys in priority order."""
+    keys: List[str] = []
+    for var in ["GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEYS"]:
+        raw = os.getenv(var, "")
+        if raw:
+            for k in raw.split(","):
+                k = k.strip()
+                if k and k not in keys:
+                    keys.append(k)
+    return keys
+
+
+def create_genai_clients(preferred_key: Optional[str] = None) -> List[genai.Client]:
+    """Create a list of genai.Client instances supporting both Vertex AI and API keys."""
+    clients: List[genai.Client] = []
+
+    # 1. Check Vertex AI service account / project mode (consumes Google Developer Program credits)
+    cred_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    project = os.getenv("VERTEX_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCLOUD_PROJECT") or "omp-gemini-507412"
+    location = os.getenv("VERTEX_LOCATION", "us-central1")
+
+    if cred_file:
+        expanded_cred = os.path.expanduser(cred_file)
+        if Path(expanded_cred).exists():
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = expanded_cred
+            try:
+                logger.info(f"Initializing Vertex AI client (project: {project}, location: {location})")
+                v_client = genai.Client(
+                    vertexai=True,
+                    project=project,
+                    location=location,
+                    http_options=types.HttpOptions(timeout=180_000),  # 180 seconds in milliseconds
+                )
+                clients.append(v_client)
+            except Exception as e:
+                logger.warning(f"Could not initialize Vertex AI client: {e}")
+
+    # 2. Add API key clients
+    keys = [preferred_key] if preferred_key else get_gemini_api_keys()
+    for k in keys:
+        try:
+            clients.append(genai.Client(api_key=k, http_options=types.HttpOptions(timeout=180_000)))  # 180 seconds
+        except Exception as e:
+            logger.warning(f"Could not initialize API key client: {e}")
+
+    if not clients:
+        raise ValueError("No valid Gemini API keys or Vertex credentials found in environment.")
+    return clients
 
 
 def format_timestamp(seconds: float) -> str:
@@ -111,12 +161,13 @@ class ProsodyTranscriber:
     """Manages audio upload, Gemini prosody transcription, parallel chunking, caching, and file cleanup."""
 
     def __init__(self, api_key: Optional[str] = None, preferred_model: Optional[str] = None):
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
-            raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
-        self.client = genai.Client(api_key=self.api_key)
-        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-3.7-flash")
+        self.clients = create_genai_clients(preferred_key=api_key)
+        self.preferred_model = preferred_model or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         self.last_model_used: Optional[str] = None
+
+    @property
+    def client(self) -> genai.Client:
+        return self.clients[0]
 
     def _extract_response_text(self, response) -> str:
         """Extract text cleanly from Gemini response object."""
@@ -141,9 +192,8 @@ class ProsodyTranscriber:
         max_model_retries: int = 5,
     ) -> str:
         """
-        Generate prosody transcription for an audio file/chunk with serialized upload and parallel inference.
+        Generate prosody transcription for an audio file/chunk with fast Vertex AI inline bytes, key rotation, and parallel inference.
         """
-        uploaded_file = None
         models_to_try = []
         pref = preferred_model or self.preferred_model
         if pref:
@@ -153,72 +203,123 @@ class ProsodyTranscriber:
                 models_to_try.append(m)
 
         last_error = None
-        try:
-            for model_name in models_to_try:
-                for attempt in range(1, max_model_retries + 1):
-                    try:
-                        # Serialize file uploads to avoid bandwidth congestion
-                        if not uploaded_file:
-                            with _UPLOAD_LOCK:
-                                logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB)...")
-                                uploaded_file = self.client.files.upload(file=str(file_path))
 
-                            # Polling is executed outside the upload lock so other workers are not blocked!
-                            poll_start = time.time()
-                            while uploaded_file.state.name == "PROCESSING":
-                                if time.time() - poll_start > 180:
-                                    raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
-                                time.sleep(1.0)
-                                uploaded_file = self.client.files.get(name=uploaded_file.name)
+        # Iterate across available clients (Vertex AI first, then API keys)
+        for client_idx, client in enumerate(self.clients):
+            is_vertex = getattr(client, "vertexai", False)
+            uploaded_file = None
+            audio_content = None
 
-                            if uploaded_file.state.name != "ACTIVE":
-                                raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+            advance_client = False
+            try:
+                # On Vertex AI, pass audio bytes directly (fast, zero upload/delete overhead)
+                if is_vertex:
+                    audio_bytes = file_path.read_bytes()
+                    audio_content = types.Part.from_bytes(data=audio_bytes, mime_type="audio/mp3")
 
-                        logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' (attempt {attempt}/{max_model_retries})...")
-                        t0 = time.time()
-                        response = self.client.models.generate_content(
-                            model=model_name,
-                            contents=[uploaded_file, prompt],
-                            config=types.GenerateContentConfig(
-                                temperature=0.2,
-                                automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-                            ),
-                        )
-                        text = self._extract_response_text(response)
-                        if text:
-                            self.last_model_used = model_name
-                            elapsed = time.time() - t0
-                            logger.info(f"[{file_path.stem}] Success with '{model_name}' ({len(text)} chars in {elapsed:.1f}s).")
-                            return text
-                        logger.warning(f"[{file_path.stem}] Empty response text from {model_name}.")
+                for model_name in models_to_try:
+                    for attempt in range(1, max_model_retries + 1):
+                        try:
+                            # On Developer API keys, upload remote file
+                            if not is_vertex and not uploaded_file:
+                                with _UPLOAD_LOCK:
+                                    logger.info(f"[{file_path.stem}] Uploading to Gemini Files API ({file_path.stat().st_size / (1024*1024):.2f} MB) via Client {client_idx+1}...")
+                                    uploaded_file = client.files.upload(file=str(file_path))
 
-                    except Exception as e:
-                        err_str = str(e)
-                        last_error = e
-                        if "limit: 0" in err_str or "404" in err_str or "NOT_FOUND" in err_str:
-                            logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota or not found. Skipping model.")
-                            break
-                        elif "503" in err_str or "UNAVAILABLE" in err_str or "timeout" in err_str.lower() or "handshake" in err_str.lower() or "ssl" in err_str.lower():
-                            wait_s = min(60, attempt * 6)
-                            logger.warning(f"[{file_path.stem}] Network/API glitch ({err_str[:60]}...). Retrying in {wait_s}s...")
-                            time.sleep(wait_s)
-                            if "ssl" in err_str.lower() or "handshake" in err_str.lower():
+                                poll_start = time.time()
+                                while uploaded_file.state.name == "PROCESSING":
+                                    if time.time() - poll_start > 180:
+                                        stale_file = uploaded_file
+                                        uploaded_file = None
+                                        try:
+                                            client.files.delete(name=stale_file.name)
+                                        except Exception:
+                                            pass
+                                        raise TimeoutError(f"Timeout waiting for audio file {stale_file.name} to process.")
+                                    time.sleep(1.0)
+                                    uploaded_file = client.files.get(name=uploaded_file.name)
+
+                                if uploaded_file.state.name != "ACTIVE":
+                                    stale_file = uploaded_file
+                                    uploaded_file = None
+                                    try:
+                                        client.files.delete(name=stale_file.name)
+                                    except Exception:
+                                        pass
+                                    raise RuntimeError(f"Audio file failed processing on Gemini: state={stale_file.state.name}")
+
+                            payload_content = audio_content if is_vertex else uploaded_file
+                            client_label = "Vertex AI" if is_vertex else f"Key {client_idx+1}"
+                            logger.info(f"[{file_path.stem}] Transcribing via '{model_name}' ({client_label}, attempt {attempt}/{max_model_retries})...")
+                            t0 = time.time()
+                            response = client.models.generate_content(
+                                model=model_name,
+                                contents=[payload_content, prompt],
+                                config=types.GenerateContentConfig(
+                                    temperature=0.2,
+                                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                                ),
+                            )
+                            text = self._extract_response_text(response)
+                            if text:
+                                self.last_model_used = model_name
+                                elapsed = time.time() - t0
+                                logger.info(f"[{file_path.stem}] Success with '{model_name}' ({len(text)} chars in {elapsed:.1f}s).")
+                                return text
+                            logger.warning(f"[{file_path.stem}] Empty response text from {model_name}.")
+
+                        except Exception as e:
+                            err_str = str(e)
+                            last_error = e
+
+                            # 404 Model not supported on this endpoint (e.g. Vertex vs Studio): skip model immediately
+                            if "404" in err_str or "NOT_FOUND" in err_str or "not found" in err_str.lower():
+                                break
+
+                            # Key disabled, permission denied, credits depleted, or upload rate limited: advance immediately to next client
+                            if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str or "depleted" in err_str.lower() or "billing" in err_str.lower() or (not is_vertex and not uploaded_file and ("429" in err_str or "RESOURCE_EXHAUSTED" in err_str)):
+                                logger.warning(f"Client {client_idx+1} hit upload/auth/quota error ({err_str[:80]}...). Advancing immediately to next client.")
+                                advance_client = True
+                                if uploaded_file and uploaded_file.name:
+                                    try:
+                                        client.files.delete(name=uploaded_file.name)
+                                    except Exception:
+                                        pass
                                 uploaded_file = None
-                        elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                            wait_s = min(60, attempt * 8)
-                            logger.warning(f"[{file_path.stem}] '{model_name}' rate limited (429). Retrying in {wait_s}s...")
-                            time.sleep(wait_s)
-                        else:
-                            time.sleep(3)
+                                break
 
-            raise RuntimeError(f"All models failed for {file_path.name}: {last_error}")
+                            if "limit: 0" in err_str:
+                                logger.warning(f"[{file_path.stem}] '{model_name}' has 0 quota. Skipping model.")
+                                break
+                            elif any(k in err_str.lower() for k in ("503", "unavailable", "timeout", "handshake", "ssl", "errno 8", "nodename", "servname", "getaddrinfo", "connection", "remote end closed", "unreachable")):
+                                wait_s = min(60, attempt * 8)
+                                logger.warning(f"[{file_path.stem}] Network/API glitch ({err_str[:60]}...). Retrying in {wait_s}s...")
+                                time.sleep(wait_s)
+                                if any(k in err_str.lower() for k in ("ssl", "handshake", "errno 8", "nodename", "connection")):
+                                    if uploaded_file and uploaded_file.name:
+                                        try:
+                                            client.files.delete(name=uploaded_file.name)
+                                        except Exception:
+                                            pass
+                                    uploaded_file = None
+                            elif "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                                wait_s = min(60, attempt * 8)
+                                logger.warning(f"[{file_path.stem}] '{model_name}' rate limited (429). Retrying in {wait_s}s...")
+                                time.sleep(wait_s)
+                            else:
+                                time.sleep(5)
 
-        finally:
-            if uploaded_file and uploaded_file.name:
-                try:
-                    self.client.files.delete(name=uploaded_file.name)
-                except Exception as del_err:
-                    logger.warning(f"Failed to delete remote file {uploaded_file.name}: {del_err}")
+                    if advance_client:
+                        break
+
+            finally:
+                if uploaded_file and uploaded_file.name:
+                    try:
+                        client.files.delete(name=uploaded_file.name)
+                    except Exception as del_err:
+                        logger.warning(f"Failed to delete remote file {uploaded_file.name}: {del_err}")
+
+        raise RuntimeError(f"All clients and models failed for {file_path.name}: {last_error}")
 
     def audit_transcript(
         self,
@@ -226,9 +327,9 @@ class ProsodyTranscriber:
         existing_transcript: str,
         max_model_retries: int = 1,
     ) -> dict:
-        """Have Gemini 3.7 Flash assess an existing transcript against its source audio."""
+        """Have Gemini assess an existing transcript against its source audio."""
         prompt = f"""Audit the existing podcast transcript against the attached source audio.
-Use Gemini 3.7 Flash for this audit. Do not rewrite the transcript.
+Do not rewrite the transcript.
 
 Return one JSON object only:
 {{
@@ -255,7 +356,7 @@ Existing transcript:
         raw = self._transcribe_single_file(
             audio_path,
             prompt,
-            preferred_model="gemini-3.7-flash",
+            preferred_model=self.preferred_model,
             max_model_retries=max_model_retries,
         ).strip()
         raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw, flags=re.DOTALL).strip()
@@ -322,7 +423,7 @@ Existing transcript:
             return idx, raw_chunk_text
         finally:
             if chunk_audio_file.exists():
-                chunk_audio_file.unlink()
+                chunk_audio_file.unlink(missing_ok=True)
 
     def transcribe_audio_file(
         self,
@@ -330,6 +431,7 @@ Existing transcript:
         episode: Optional[Episode] = None,
         chunk_duration_sec: int = 480,  # 8 minutes per chunk
         max_workers: int = 2,  # 2 workers for peak connection & rate limit stability
+        force: bool = False,
     ) -> str:
         """
         Transcribe full audio file using parallel chunks with disk caching and single-pass timestamp normalization.
@@ -355,8 +457,17 @@ Existing transcript:
         num_chunks = math.ceil(duration / chunk_duration_sec)
         logger.info(f"Processing audio in {num_chunks} chunks ({chunk_duration_sec//60}m each) with {max_workers} parallel workers.")
 
-        cache_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}"
+        cache_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}_{chunk_duration_sec}s"
+        if force:
+            shutil.rmtree(cache_dir, ignore_errors=True)
+            legacy_dir = audio_path.parent / f".chunk_cache_{audio_path.stem}"
+            shutil.rmtree(legacy_dir, ignore_errors=True)
+
         cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # Clean any orphaned .mp3 audio slices in cache dir
+        for stray_mp3 in cache_dir.glob("chunk_*.mp3"):
+            stray_mp3.unlink(missing_ok=True)
 
         chunk_results: Dict[int, str] = {}
 
@@ -374,47 +485,63 @@ Existing transcript:
                 seg_len = min(chunk_duration_sec, duration - start_sec)
                 needed_chunks.append((idx, start_sec, seg_len, self.preferred_model))
 
-        if needed_chunks:
-            logger.info(f"{len(chunk_results)}/{num_chunks} chunks already cached, {len(needed_chunks)} chunks to process.")
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-                futures = {
-                    executor.submit(
-                        self._process_chunk_worker,
-                        idx=idx,
-                        total_chunks=num_chunks,
-                        start_sec=start_sec,
-                        seg_len=seg_len,
-                        audio_path=audio_path,
-                        cache_dir=cache_dir,
-                        ffmpeg_bin=ffmpeg_bin,
-                        model_name=model,
-                    ): idx
-                    for idx, start_sec, seg_len, model in needed_chunks
-                }
+        try:
+            if needed_chunks:
+                logger.info(f"{len(chunk_results)}/{num_chunks} chunks already cached, {len(needed_chunks)} chunks to process.")
+                with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    futures = {
+                        executor.submit(
+                            self._process_chunk_worker,
+                            idx=idx,
+                            total_chunks=num_chunks,
+                            start_sec=start_sec,
+                            seg_len=seg_len,
+                            audio_path=audio_path,
+                            cache_dir=cache_dir,
+                            ffmpeg_bin=ffmpeg_bin,
+                            model_name=model,
+                        ): idx
+                        for idx, start_sec, seg_len, model in needed_chunks
+                    }
 
-                for future in concurrent.futures.as_completed(futures):
+                    batch_timeout = max(
+                        300,
+                        math.ceil(len(needed_chunks) / max_workers) * 300,
+                    )
                     try:
-                        idx, text = future.result(timeout=300)
-                        chunk_results[idx] = text
-                    except Exception as e:
-                        logger.warning(f"Chunk transcription error/timeout: {e}")
-                        raise
-        else:
-            logger.info(f"All {num_chunks} chunks loaded from cache.")
+                        completed = concurrent.futures.as_completed(futures, timeout=batch_timeout)
+                        for future in completed:
+                            idx, text = future.result()
+                            chunk_results[idx] = text
+                    except concurrent.futures.TimeoutError as e:
+                        for pending in futures:
+                            pending.cancel()
+                        logger.warning(f"Chunk transcription batch timed out after {batch_timeout}s.")
+                        raise TimeoutError(
+                            f"Chunk transcription batch exceeded {batch_timeout}s"
+                        ) from e
+            else:
+                logger.info(f"All {num_chunks} chunks loaded from cache.")
 
-        # 3. Assemble and normalize timestamps in a single pass
-        full_transcripts = []
-        for i in range(num_chunks):
-            raw_text = chunk_results.get(i, "")
-            start_sec = i * chunk_duration_sec
-            adjusted_text = adjust_chunk_timestamps(raw_text, start_sec)
-            full_transcripts.append(adjusted_text)
+            # 3. Assemble and normalize timestamps in a single pass
+            full_transcripts = []
+            for i in range(num_chunks):
+                raw_text = chunk_results.get(i, "")
+                start_sec = i * chunk_duration_sec
+                adjusted_text = adjust_chunk_timestamps(raw_text, start_sec)
+                full_transcripts.append(adjusted_text)
 
-        full_transcript = "\n\n".join(full_transcripts)
+            full_transcript = "\n\n".join(full_transcripts)
 
-        # Cleanup cache on complete success
-        shutil.rmtree(cache_dir, ignore_errors=True)
-        return full_transcript
+            # Cleanup cache on complete success
+            shutil.rmtree(cache_dir, ignore_errors=True)
+            return full_transcript
+
+        finally:
+            # Always clean orphaned intermediate chunk audio slices
+            if cache_dir.exists():
+                for stray in cache_dir.glob("chunk_*.mp3"):
+                    stray.unlink(missing_ok=True)
 
     def create_formatted_markdown(
         self,

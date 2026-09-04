@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import time
 from collections import Counter
 from dataclasses import asdict, dataclass, field
@@ -79,36 +80,60 @@ def get_audio_info(audio_path: Path) -> Tuple[float, int]:
         return 0.0, 0
     try:
         cmd = [ffprobe_bin, "-v", "quiet", "-print_format", "json", "-show_format", str(audio_path)]
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=30)
         data = json.loads(res.stdout).get("format", {})
         dur = float(data.get("duration", 0.0))
         bitrate = int(data.get("bit_rate", 0))
         return dur, bitrate
-    except Exception:
+    except Exception as exc:
+        logger.warning("ffprobe failed for %s: %s", audio_path, exc)
         return 0.0, 0
 
+def _timestamp_seconds(value: str) -> float:
+    try:
+        parts = [float(part) for part in value.split(":")]
+    except (AttributeError, TypeError, ValueError):
+        return 0.0
+    if len(parts) == 3:
+        return parts[0] * 3600 + parts[1] * 60 + parts[2]
+    if len(parts) == 2:
+        return parts[0] * 60 + parts[1]
+    return 0.0
 
-def detect_repetition_loops(text: str, max_consecutive: int = 8) -> Optional[str]:
+
+
+def detect_repetition_loops(text: str, max_consecutive: int = 8) -> Optional[Tuple[str, int]]:
+    """Return the first repeated phrase and count.
+
+    Sentence-frequency detection catches long model loops whose cycle exceeds
+    the token n-gram window; the token pass still catches short consecutive
+    loops while allowing ordinary liturgical repetition to remain a warning.
     """
-    Detect if the AI got stuck in a consecutive repetition hallucination loop.
-    Distinguishes natural song lyrics from runaway model loops.
-    """
+    sentences = [
+        " ".join(re.findall(r"\b\w+\b", sentence.lower()))
+        for sentence in re.split(r"(?:[.!?]\s+|\n+)", text)
+    ]
+    sentence_counts = Counter(sentence for sentence in sentences if len(sentence.split()) >= 4)
+    if sentence_counts:
+        sentence, repeats = sentence_counts.most_common(1)[0]
+        if repeats >= max_consecutive:
+            return sentence, repeats
+
     paragraphs = text.split("\n\n")
-    for p in paragraphs:
-        words = re.findall(r"\b\w+\b", p.lower())
-        if len(words) >= 15:
-            # Check 3-word to 6-word consecutive repeats
-            for n in [3, 4, 5, 6]:
-                for i in range(len(words) - n * 3):
-                    pattern = words[i : i + n]
-                    repeats = 1
-                    curr = i + n
-                    while curr + n <= len(words) and words[curr : curr + n] == pattern:
-                        repeats += 1
-                        curr += n
-                    if repeats >= max_consecutive:
-                        repeated_phrase = " ".join(pattern)
-                        return f"Consecutive phrase '{repeated_phrase}' repeated {repeats} times in paragraph"
+    for paragraph in paragraphs:
+        words = re.findall(r"\b\w+\b", paragraph.lower())
+        if len(words) < 15:
+            continue
+        for size in (3, 4, 5, 6):
+            for index in range(len(words) - size * max_consecutive + 1):
+                pattern = words[index : index + size]
+                repeats = 1
+                cursor = index + size
+                while cursor + size <= len(words) and words[cursor : cursor + size] == pattern:
+                    repeats += 1
+                    cursor += size
+                if repeats >= max_consecutive:
+                    return " ".join(pattern), repeats
     return None
 
 
@@ -126,6 +151,15 @@ class PodcastValidator:
         self.processed_dir = processed_dir
         self.trimmed_dir = trimmed_dir
         self.local_drive = local_drive_path
+        try:
+            manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            manifest = {}
+        self.manifest_by_md = {
+            record.get("md_file"): record
+            for record in manifest.values()
+            if record.get("md_file")
+        }
 
     def validate_episode(self, md_path: Path) -> EpisodeQAReport:
         """Run all guardrail checks for a given episode."""
@@ -145,6 +179,7 @@ class PodcastValidator:
         # 1. Raw Audio Checks
         raw_dur, raw_bitrate = get_audio_info(raw_audio_path)
         raw_size_mb = raw_audio_path.stat().st_size / (1024 * 1024) if raw_audio_path.exists() else 0.0
+        sermon_ratio = 0.0
 
         is_ci = os.getenv("CI", "false").lower() in ["true", "1", "yes"]
 
@@ -180,13 +215,30 @@ class PodcastValidator:
             else:
                 checks.append(CheckResult("PREACHING_DURATION", True, "INFO", f"Sermon length: {trimmed_dur/60:.1f}m."))
 
-            # Sermon ratio (sermon should be ~20% to 85% of full Sunday service)
-            sermon_ratio = (trimmed_dur / raw_dur) if raw_dur > 0 else 0.0
-            if sermon_ratio < 0.20 or sermon_ratio > 0.90:
-                checks.append(CheckResult("SERMON_RATIO", False, "WARNING", f"Sermon takes {sermon_ratio*100:.1f}% of total service."))
+            # Sermon ratio (sermon should be 20% to 90% of the full service).
+            if raw_dur > 0:
+                sermon_ratio = trimmed_dur / raw_dur
+                if sermon_ratio < 0.20 or sermon_ratio > 0.90:
+                    checks.append(CheckResult("SERMON_RATIO", False, "ERROR", f"Sermon takes {sermon_ratio*100:.1f}% of total service."))
+                else:
+                    checks.append(CheckResult("SERMON_RATIO", True, "INFO", f"Sermon ratio: {sermon_ratio*100:.1f}% of service."))
             else:
-                checks.append(CheckResult("SERMON_RATIO", True, "INFO", f"Sermon ratio: {sermon_ratio*100:.1f}% of service."))
-        sermon_ratio = (trimmed_dur / raw_dur) if raw_dur > 0 else 0.0
+                sermon_ratio = 0.0
+                checks.append(CheckResult("SERMON_RATIO", False, "WARNING", "Sermon ratio unavailable because raw audio duration could not be measured."))
+
+            manifest_record = self.manifest_by_md.get(md_path.name)
+            if manifest_record:
+                declared_start = _timestamp_seconds(manifest_record.get("preaching_start"))
+                declared_end = _timestamp_seconds(manifest_record.get("preaching_end"))
+                if declared_start < 60:
+                    checks.append(CheckResult("PREACHING_START", False, "ERROR", f"Preaching starts implausibly early at {manifest_record.get('preaching_start')}."))
+                else:
+                    checks.append(CheckResult("PREACHING_START", True, "INFO", f"Preaching starts at {manifest_record.get('preaching_start')}."))
+                declared_duration = declared_end - declared_start
+                if declared_duration > 0 and abs(declared_duration - trimmed_dur) > 5:
+                    checks.append(CheckResult("MANIFEST_AUDIO_DURATION", False, "ERROR", f"Manifest boundary duration ({declared_duration:.1f}s) differs from trimmed audio ({trimmed_dur:.1f}s)."))
+                elif declared_duration > 0:
+                    checks.append(CheckResult("MANIFEST_AUDIO_DURATION", True, "INFO", "Manifest boundaries match trimmed audio duration."))
 
         # 3. Transcript Quality & Prosody Checks
         words = re.findall(r"\b\w+\b", transcript_text)
@@ -196,6 +248,13 @@ class PodcastValidator:
             checks.append(CheckResult("TRANSCRIPT_EXISTS", False, "ERROR", "Transcript Markdown is missing or empty."))
         else:
             checks.append(CheckResult("TRANSCRIPT_EXISTS", True, "INFO", f"Transcript size: {len(transcript_text)} chars ({word_count} words)."))
+
+        if word_count > 50000:
+            checks.append(CheckResult("TRANSCRIPT_WORD_COUNT", False, "ERROR", f"Transcript is implausibly long: {word_count} words."))
+        elif word_count > 30000:
+            checks.append(CheckResult("TRANSCRIPT_WORD_COUNT", False, "WARNING", f"Transcript is unusually long: {word_count} words."))
+        else:
+            checks.append(CheckResult("TRANSCRIPT_WORD_COUNT", True, "INFO", f"Transcript word count is plausible: {word_count}."))
 
         # YAML Frontmatter
         if "---" in transcript_text and "title:" in transcript_text and "author:" in transcript_text:
@@ -226,27 +285,29 @@ class PodcastValidator:
         else:
             checks.append(CheckResult("SPEAKER_TIMESTAMPS", True, "INFO", f"Found {len(speaker_headings)} speaker timestamp headings."))
 
-        # Repetition loop detection
+        # Repetition loop detection. Small refrain-like loops are warnings;
+        # runaway model loops are unusable artifacts and must fail QA.
         rep_loop = detect_repetition_loops(transcript_text)
         if rep_loop:
-            checks.append(CheckResult("NO_REPETITION_LOOPS", False, "WARNING", f"Hallucination loop: {rep_loop}"))
+            phrase, repeat_count = rep_loop
+            severity = "ERROR" if repeat_count >= 50 else "WARNING"
+            checks.append(CheckResult("NO_REPETITION_LOOPS", False, severity, f"Hallucination loop: Consecutive phrase '{phrase}' repeated {repeat_count} times."))
         else:
             checks.append(CheckResult("NO_REPETITION_LOOPS", True, "INFO", "No repetition loops detected."))
 
         # 4. Google Drive Sync Checks
         drive_md = self.local_drive / "Transcripts" / md_path.name
         drive_mp3 = self.local_drive / "TrimmedAudio" / trimmed_audio_path.name
-
         if self.local_drive.exists():
-            if drive_md.exists() and drive_md.stat().st_size > 0:
-                checks.append(CheckResult("DRIVE_TRANSCRIPT_SYNC", True, "INFO", "Transcript synced to Google Drive."))
+            if drive_md.exists() and drive_md.stat().st_size == md_path.stat().st_size:
+                checks.append(CheckResult("DRIVE_TRANSCRIPT_SYNC", True, "INFO", "Transcript synced to Google Drive with matching byte count."))
             else:
-                checks.append(CheckResult("DRIVE_TRANSCRIPT_SYNC", False, "WARNING", "Transcript not found in Drive Transcripts folder."))
+                checks.append(CheckResult("DRIVE_TRANSCRIPT_SYNC", False, "WARNING", "Transcript missing from Drive or byte count differs."))
 
-            if drive_mp3.exists() and drive_mp3.stat().st_size > 0:
-                checks.append(CheckResult("DRIVE_AUDIO_SYNC", True, "INFO", "Trimmed audio synced to Google Drive."))
+            if drive_mp3.exists() and trimmed_audio_path.exists() and drive_mp3.stat().st_size == trimmed_audio_path.stat().st_size:
+                checks.append(CheckResult("DRIVE_AUDIO_SYNC", True, "INFO", "Trimmed audio synced to Google Drive with matching byte count."))
             else:
-                checks.append(CheckResult("DRIVE_AUDIO_SYNC", False, "WARNING", "Trimmed audio not found in Drive TrimmedAudio folder."))
+                checks.append(CheckResult("DRIVE_AUDIO_SYNC", False, "WARNING", "Trimmed audio missing from Drive or byte count differs."))
 
         # Determine overall episode status
         has_error = any(not c.passed and c.severity == "ERROR" for c in checks)
@@ -335,18 +396,32 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Podcast Processing CI & QA Validator")
     parser.add_argument("--audit", action="store_true", default=True, help="Run audit on all processed files")
     parser.add_argument("--file", help="Validate specific markdown file")
+    parser.add_argument("--check-report", type=Path, help="Fail if a committed QA report is empty or contains FAIL entries")
 
     args = parser.parse_args()
+    if args.check_report:
+        report_data = json.loads(args.check_report.read_text(encoding="utf-8"))
+        if not report_data:
+            logger.error("QA report is empty; refusing to pass.")
+            sys.exit(1)
+        failed = [entry for entry in report_data if entry.get("status") == "FAIL"]
+        if failed:
+            logger.error("QA report contains %d failed episode(s).", len(failed))
+            sys.exit(1)
+        logger.info("QA report accepted: %d episodes, no FAIL entries.", len(report_data))
+        sys.exit(0)
+
     validator = PodcastValidator()
 
     if args.file:
         rep = validator.validate_episode(Path(args.file))
         print(json.dumps(rep.to_dict(), indent=2))
         if rep.status == "FAIL":
-            import sys
             sys.exit(1)
     else:
         reports = validator.audit_all()
+        if not reports:
+            logger.error("No transcript artifacts were evaluated; refusing to report a passing QA run.")
+            sys.exit(1)
         if any(r.status == "FAIL" for r in reports):
-            import sys
             sys.exit(1)
