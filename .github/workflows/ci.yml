@@ -39,6 +39,5 @@ jobs:
         run: |
           uv run pytest -v
 
-      - name: Run QA Guardrails Validator
-        run: |
-          uv run python validator.py
+      - name: Validate committed QA report
+        run: uv run python validator.py --check-report qa_report.json

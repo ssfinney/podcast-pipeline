@@ -210,6 +210,7 @@ class ProsodyTranscriber:
             uploaded_file = None
             audio_content = None
 
+            advance_client = False
             try:
                 # On Vertex AI, pass audio bytes directly (fast, zero upload/delete overhead)
                 if is_vertex:
@@ -228,12 +229,24 @@ class ProsodyTranscriber:
                                 poll_start = time.time()
                                 while uploaded_file.state.name == "PROCESSING":
                                     if time.time() - poll_start > 180:
-                                        raise TimeoutError(f"Timeout waiting for audio file {uploaded_file.name} to process.")
+                                        stale_file = uploaded_file
+                                        uploaded_file = None
+                                        try:
+                                            client.files.delete(name=stale_file.name)
+                                        except Exception:
+                                            pass
+                                        raise TimeoutError(f"Timeout waiting for audio file {stale_file.name} to process.")
                                     time.sleep(1.0)
                                     uploaded_file = client.files.get(name=uploaded_file.name)
 
                                 if uploaded_file.state.name != "ACTIVE":
-                                    raise RuntimeError(f"Audio file failed processing on Gemini: state={uploaded_file.state.name}")
+                                    stale_file = uploaded_file
+                                    uploaded_file = None
+                                    try:
+                                        client.files.delete(name=stale_file.name)
+                                    except Exception:
+                                        pass
+                                    raise RuntimeError(f"Audio file failed processing on Gemini: state={stale_file.state.name}")
 
                             payload_content = audio_content if is_vertex else uploaded_file
                             client_label = "Vertex AI" if is_vertex else f"Key {client_idx+1}"
@@ -266,6 +279,7 @@ class ProsodyTranscriber:
                             # Key disabled, permission denied, credits depleted, or upload rate limited: advance immediately to next client
                             if "403" in err_str or "PERMISSION_DENIED" in err_str or "SERVICE_DISABLED" in err_str or "depleted" in err_str.lower() or "billing" in err_str.lower() or (not is_vertex and not uploaded_file and ("429" in err_str or "RESOURCE_EXHAUSTED" in err_str)):
                                 logger.warning(f"Client {client_idx+1} hit upload/auth/quota error ({err_str[:80]}...). Advancing immediately to next client.")
+                                advance_client = True
                                 if uploaded_file and uploaded_file.name:
                                     try:
                                         client.files.delete(name=uploaded_file.name)
@@ -295,8 +309,7 @@ class ProsodyTranscriber:
                             else:
                                 time.sleep(5)
 
-                    # If client was disabled/blocked/throttled on upload, jump to next client
-                    if "403" in str(last_error) or "PERMISSION_DENIED" in str(last_error) or "SERVICE_DISABLED" in str(last_error) or "depleted" in str(last_error).lower() or (not is_vertex and not uploaded_file):
+                    if advance_client:
                         break
 
             finally:
@@ -491,13 +504,22 @@ Existing transcript:
                         for idx, start_sec, seg_len, model in needed_chunks
                     }
 
-                    for future in concurrent.futures.as_completed(futures):
-                        try:
-                            idx, text = future.result(timeout=300)
+                    batch_timeout = max(
+                        300,
+                        math.ceil(len(needed_chunks) / max_workers) * 300,
+                    )
+                    try:
+                        completed = concurrent.futures.as_completed(futures, timeout=batch_timeout)
+                        for future in completed:
+                            idx, text = future.result()
                             chunk_results[idx] = text
-                        except Exception as e:
-                            logger.warning(f"Chunk transcription error/timeout: {e}")
-                            raise
+                    except concurrent.futures.TimeoutError as e:
+                        for pending in futures:
+                            pending.cancel()
+                        logger.warning(f"Chunk transcription batch timed out after {batch_timeout}s.")
+                        raise TimeoutError(
+                            f"Chunk transcription batch exceeded {batch_timeout}s"
+                        ) from e
             else:
                 logger.info(f"All {num_chunks} chunks loaded from cache.")
 

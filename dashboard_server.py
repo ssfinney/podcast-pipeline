@@ -10,6 +10,7 @@ import math
 import os
 import re
 import socketserver
+import threading
 import time
 import urllib.parse
 from pathlib import Path
@@ -36,12 +37,17 @@ DRIVE_LOCAL_PATH = Path(
 )
 
 PORT = int(os.getenv("DASHBOARD_PORT", "8420"))
+DOWNLOAD_STALE_SEC = 300
+TRANSCRIBE_STALE_SEC = 900
 
 # Cache feed entries
 FEED_CACHE_FILE = BASE_DIR / "feed_cache.json"
 
 # Cache storage calculations
 _STORAGE_CACHE = {"timestamp": 0.0, "data": {"raw_mb": 0.0, "trimmed_mb": 0.0, "md_mb": 0.0, "total_mb": 0.0}}
+_FEED_CACHE_LOCK = threading.Lock()
+
+
 
 
 def get_cached_storage_stats() -> Dict[str, float]:
@@ -53,7 +59,14 @@ def get_cached_storage_stats() -> Dict[str, float]:
     def dir_size_mb(path: Path) -> float:
         if not path.exists():
             return 0.0
-        return sum(f.stat().st_size for f in path.glob("**/*") if f.is_file()) / (1024 * 1024)
+        total = 0
+        for file_path in path.glob("**/*"):
+            try:
+                if file_path.is_file():
+                    total += file_path.stat().st_size
+            except OSError:
+                continue
+        return total / (1024 * 1024)
 
     raw_mb = dir_size_mb(AUDIO_DIR)
     trimmed_mb = dir_size_mb(TRIMMED_DIR)
@@ -71,23 +84,44 @@ def get_cached_storage_stats() -> Dict[str, float]:
 
 
 def get_feed_entries() -> List[dict]:
-    """Load or cache all episodes from RSS feed."""
-    if FEED_CACHE_FILE.exists() and time.time() - FEED_CACHE_FILE.stat().st_mtime < 3600:
-        try:
+    """Load or refresh the RSS feed cache once per process."""
+    with _FEED_CACHE_LOCK:
+        return _get_feed_entries_locked()
+
+
+def _get_feed_entries_locked() -> List[dict]:
+    """Load or cache all episodes from RSS feed. Caller holds the cache lock."""
+    try:
+        cache_stat = FEED_CACHE_FILE.stat()
+        if time.time() - cache_stat.st_mtime < 3600:
             with open(FEED_CACHE_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception:
-            pass
+    except (OSError, json.JSONDecodeError):
+        pass
 
-    import feedparser
     from downloader import DEFAULT_FEED_URL, fetch_episodes
 
     try:
         eps = fetch_episodes(DEFAULT_FEED_URL)
-        return [e.to_dict() for e in eps]
+        entries = [e.to_dict() for e in eps]
+        # Atomic persist so concurrent readers never see partial JSON
+        tmp_cache = FEED_CACHE_FILE.with_suffix(f".{os.getpid()}.tmp")
+        with open(tmp_cache, "w", encoding="utf-8") as f:
+            json.dump(entries, f)
+        os.replace(tmp_cache, FEED_CACHE_FILE)
+        return entries
     except Exception as e:
+        tmp_cache_path = FEED_CACHE_FILE.with_suffix(f".{os.getpid()}.tmp")
+        tmp_cache_path.unlink(missing_ok=True)
         logger.warning(f"Error fetching feed: {e}")
         return []
+
+
+def _safe_stat(path: Path):
+    try:
+        return path.stat()
+    except OSError:
+        return None
 
 
 def detect_current_active_stage() -> Dict[str, Any]:
@@ -105,11 +139,16 @@ def detect_current_active_stage() -> Dict[str, Any]:
         "chunks_total": 0,
     }
 
-    # 1. Check if downloading audio (.tmp.mp3 modified within last 5 minutes)
-    tmp_audios = [f for f in AUDIO_DIR.glob("*.tmp.mp3") if time.time() - f.stat().st_mtime < 300]
+    # 1. Check if downloading audio (.tmp.mp3 modified recently)
+    now = time.time()
+    tmp_audios = []
+    for path in AUDIO_DIR.glob("*.tmp.mp3"):
+        stat = _safe_stat(path)
+        if stat and now - stat.st_mtime < DOWNLOAD_STALE_SEC:
+            tmp_audios.append((path, stat))
     if tmp_audios:
-        tmp_file = tmp_audios[0]
-        size_mb = tmp_file.stat().st_size / (1024 * 1024)
+        tmp_file, tmp_stat = tmp_audios[0]
+        size_mb = tmp_stat.st_size / (1024 * 1024)
         active_info.update({
             "is_active": True,
             "stage": "DOWNLOADING",
@@ -121,15 +160,26 @@ def detect_current_active_stage() -> Dict[str, Any]:
         return active_info
 
     # 2. Check if transcribing chunks (.chunk_cache_*)
-    raw_chunk_dirs = [d for d in AUDIO_DIR.glob(".chunk_cache_*") if d.is_dir()]
-    chunk_dirs = [d for d in raw_chunk_dirs if time.time() - d.stat().st_mtime < 900]
+    chunk_dirs = []
+    for path in AUDIO_DIR.glob(".chunk_cache_*"):
+        stat = _safe_stat(path)
+        if stat and now - stat.st_mtime < TRANSCRIBE_STALE_SEC:
+            chunk_dirs.append((path, stat))
     if chunk_dirs:
-        cdir = max(chunk_dirs, key=lambda d: d.stat().st_mtime)
-        title = re.sub(r"^\.chunk_cache_", "", cdir.name)
-        title = re.sub(r"_\d+s$", "", title)
+        cdir, _ = max(chunk_dirs, key=lambda item: item[1].st_mtime)
+        title_with_suffix = re.sub(r"^\.chunk_cache_", "", cdir.name)
+        suffix_match = re.search(r"_(\d+)s$", title_with_suffix)
+        chunk_duration_sec = int(suffix_match.group(1)) if suffix_match else 480
+        title = re.sub(r"_\d+s$", "", title_with_suffix)
         txt_chunks = len(list(cdir.glob("chunk_*.txt")))
         mp3_chunks = len(list(cdir.glob("chunk_*.mp3")))
-        total_estimate = max(txt_chunks + mp3_chunks, 1)
+        source_audio = AUDIO_DIR / f"{title}.mp3"
+        source_stat = _safe_stat(source_audio)
+        if source_stat:
+            estimated_duration = (source_stat.st_size * 8) / 64_000
+            total_estimate = max(mp3_chunks, 1, math.ceil(estimated_duration / chunk_duration_sec))
+        else:
+            total_estimate = max(mp3_chunks, 1)
         active_info.update({
             "is_active": True,
             "stage": "TRANSCRIBING",
@@ -143,10 +193,11 @@ def detect_current_active_stage() -> Dict[str, Any]:
         return active_info
 
     # 3. Check if trimming (.tmp.mp3 in TrimmedAudio)
-    tmp_trimmed = list(TRIMMED_DIR.glob("*.tmp.mp3"))
-    if tmp_trimmed:
-        tmp_file = tmp_trimmed[0]
-        size_mb = tmp_file.stat().st_size / (1024 * 1024)
+    for tmp_file in TRIMMED_DIR.glob("*.tmp.mp3"):
+        tmp_stat = _safe_stat(tmp_file)
+        if not tmp_stat:
+            continue
+        size_mb = tmp_stat.st_size / (1024 * 1024)
         active_info.update({
             "is_active": True,
             "stage": "TRIMMING",
@@ -190,8 +241,8 @@ def get_pipeline_status() -> Dict[str, Any]:
 
                 dur = max(0, parse_timestamp_to_seconds(end_ts) - parse_timestamp_to_seconds(start_ts))
                 total_preaching_sec += dur
-            else:
-                total_preaching_sec += 2400.0  # ~40m avg
+            # Missing boundaries are excluded rather than replaced with an
+            # invented 40-minute estimate.
 
     preach_hours = int(total_preaching_sec // 3600)
     preach_mins = int((total_preaching_sec % 3600) // 60)

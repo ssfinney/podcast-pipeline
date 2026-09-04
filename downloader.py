@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import feedparser
+import requests
 import static_ffmpeg
 
 # Configure logging
@@ -98,7 +99,9 @@ def fetch_episodes(feed_url: str = DEFAULT_FEED_URL, max_retries: int = 4) -> Li
     for attempt in range(1, max_retries + 1):
         try:
             logger.info(f"Fetching RSS feed from: {feed_url} (attempt {attempt}/{max_retries})")
-            feed = feedparser.parse(feed_url)
+            response = requests.get(feed_url, timeout=(10, 30))
+            response.raise_for_status()
+            feed = feedparser.parse(response.content)
             if feed and feed.entries:
                 break
             if feed and feed.bozo and not feed.entries:
@@ -173,12 +176,17 @@ def fetch_episodes(feed_url: str = DEFAULT_FEED_URL, max_retries: int = 4) -> Li
 
     logger.info(f"Parsed {len(episodes)} episodes from feed.")
 
-    # Save to local feed cache
+    # Save to local feed cache atomically so dashboard readers never observe
+    # a partially-written JSON document.
+    cache_tmp = FEED_CACHE_PATH.with_suffix(f".{os.getpid()}.tmp.json")
     try:
-        with open(FEED_CACHE_PATH, "w", encoding="utf-8") as f:
+        with open(cache_tmp, "w", encoding="utf-8") as f:
             json.dump([e.to_dict() for e in episodes], f)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(cache_tmp, FEED_CACHE_PATH)
     except Exception:
-        pass
+        cache_tmp.unlink(missing_ok=True)
 
     return episodes
 
@@ -234,6 +242,10 @@ def download_audio(
         "1",
         "-reconnect_delay_max",
         "5",
+        "-reconnect_on_network_error",
+        "1",
+        "-rw_timeout",
+        "30000000",
         "-i",
         episode.media_url,
         "-vn",

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import shutil
+import uuid
 from pathlib import Path
 from typing import Optional
 
@@ -46,10 +47,11 @@ class DriveUploader:
     def _init_service(self):
         """Try initializing Google Drive REST API if credentials exist, otherwise utilize DriveFS local sync."""
         try:
+            import httplib2
             from google.auth.transport.requests import Request
             from google.oauth2.credentials import Credentials
+            from google_auth_httplib2 import AuthorizedHttp
             from googleapiclient.discovery import build
-
             creds = None
             if self.token_file.exists():
                 try:
@@ -76,7 +78,8 @@ class DriveUploader:
                         creds = None
 
             if creds and creds.valid:
-                self.service = build("drive", "v3", credentials=creds)
+                authorized_http = AuthorizedHttp(creds, http=httplib2.Http(timeout=60))
+                self.service = build("drive", "v3", http=authorized_http)
                 self._api_authenticated = True
                 logger.info("Google Drive REST API authenticated.")
         except Exception as init_err:
@@ -118,8 +121,16 @@ class DriveUploader:
             dest_dir = self.local_drive_path / subfolder
             dest_dir.mkdir(parents=True, exist_ok=True)
             dest_file = dest_dir / file_path.name
-            staging_file = dest_dir / f".{file_path.name}.partial"
+            staging_file = dest_dir / f".{file_path.name}.{os.getpid()}.{uuid.uuid4().hex}.partial"
             try:
+                src_stat = file_path.stat()
+                if dest_file.exists():
+                    dst_stat = dest_file.stat()
+                    if dst_stat.st_size == src_stat.st_size and dst_stat.st_mtime_ns == src_stat.st_mtime_ns:
+                        logger.debug(f"Google Drive mirror already current ({subfolder}): {dest_file.name}")
+                        result["local_drive_dest"] = str(dest_file)
+                        result["web_view_link"] = f"https://drive.google.com/drive/folders/{result['folder_id']}"
+                        return result
                 shutil.copy2(file_path, staging_file)
                 os.replace(staging_file, dest_file)
                 logger.info(f"Synced to Google Drive ({subfolder}): {dest_file.name}")

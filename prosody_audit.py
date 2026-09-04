@@ -1,4 +1,4 @@
-"""Audit completed transcripts with Gemini 3.7 Flash and selectively reprocess them."""
+"""Audit completed transcripts with Gemini and selectively reprocess them."""
 
 from __future__ import annotations
 
@@ -12,8 +12,6 @@ from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
 
 from downloader import DEFAULT_FEED_URL, Episode, fetch_episodes
 from pipeline import PodcastPipeline
@@ -30,6 +28,8 @@ logging.basicConfig(
 ROOT = Path(__file__).parent
 AUDIT_STATE_PATH = ROOT / "prosody_audit.json"
 DEFAULT_CONFIDENCE_THRESHOLD = 0.75
+MAX_REPROCESS_ATTEMPTS = 3
+
 def _fingerprint(audio_path: Path, transcript_path: Path) -> str:
     """Identify the exact local audio/transcript pair audited based on contents and sizes."""
     md_hash = hashlib.sha256(transcript_path.read_bytes()).hexdigest()
@@ -80,8 +80,7 @@ def audit_and_reprocess(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Audit eligible completed episodes, then reprocess only high-confidence failures."""
     episodes = fetch_episodes(feed_url)
-    pipeline = PodcastPipeline(model_name="gemini-3.7-flash")
-    # Clients are initialized across Vertex AI and all configured API keys
+    pipeline = PodcastPipeline()
     eligible = _eligible_episodes(episodes, pipeline)
     if limit > 0:
         eligible = eligible[:limit]
@@ -93,12 +92,13 @@ def audit_and_reprocess(
     for episode, audio_path, md_path in eligible:
         fingerprint = _fingerprint(audio_path, md_path)
         previous = state["episodes"].get(episode.guid, {})
-        if previous.get("fingerprint") == fingerprint and previous.get("audit_status") in {"AUDITED", "REPROCESSED"}:
+        if previous.get("fingerprint") == fingerprint and previous.get("audit_status") in {"AUDITED", "REPROCESSED", "REPROCESS_FAILED"}:
             logger.info("Audit already complete: %s", md_path.name)
             audit_results.append(previous)
             continue
 
-        logger.info("Auditing with Gemini 3.7 Flash: %s", md_path.name)
+        manifest_record = pipeline.manifest.get(episode.guid, {})
+        logger.info("Auditing transcript with Gemini: %s", md_path.name)
         result: dict[str, Any] = {
             "guid": episode.guid,
             "index": episode.index,
@@ -110,6 +110,25 @@ def audit_and_reprocess(
             "audit_status": "ERROR",
             "audited_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         }
+        if manifest_record.get("status") == "FAILED":
+            result.update(
+                {
+                    "audit_status": "AUDITED",
+                    "model_used": None,
+                    "needs_reprocess": True,
+                    "confidence": 1.0,
+                    "selected_for_reprocess": True,
+                    "score": None,
+                    "issues": ["Pipeline previously marked this episode FAILED."],
+                    "reason": manifest_record.get("error", "Previous pipeline failure."),
+                    "recommendation": "reprocess",
+                    "reprocess_attempts": int(previous.get("reprocess_attempts", 0)),
+                }
+            )
+            state["episodes"][episode.guid] = result
+            _save_state(state)
+            audit_results.append(result)
+            continue
         try:
             audit = pipeline.transcriber.audit_transcript(
                 audio_path=audio_path,
@@ -146,28 +165,41 @@ def audit_and_reprocess(
         _save_state(state)
         audit_results.append(result)
 
-    selected = [r for r in audit_results if r.get("audit_status") == "AUDITED" and r.get("selected_for_reprocess")]
+    selected = [
+        result
+        for result in audit_results
+        if result.get("audit_status") == "AUDITED"
+        and result.get("selected_for_reprocess")
+        and int(result.get("reprocess_attempts", 0)) < MAX_REPROCESS_ATTEMPTS
+    ]
     reprocessed: list[dict[str, Any]] = []
     by_guid = {episode.guid: episode for episode, _, _ in eligible}
     for result in selected:
         episode = by_guid[result["guid"]]
         ep_audio = pipeline.audio_dir / episode.audio_filename
         ep_md = pipeline.processed_dir / episode.md_filename
-        logger.info("Reprocessing transcript with Gemini 3.7 Flash: %s", episode.title)
+        logger.info("Reprocessing transcript with Gemini: %s", episode.title)
+        result["reprocess_attempts"] = int(result.get("reprocess_attempts", 0)) + 1
         try:
             record = pipeline.process_episode(episode, reprocess_transcript=True)
             result["reprocess_status"] = record.status
             result["reprocessed_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
-            result["reprocess_model"] = pipeline.transcriber.last_model_used
+            result["reprocess_model_last_chunk"] = pipeline.transcriber.last_model_used
             if record.status in {"SUCCESS", "PARTIAL"} and ep_audio.exists() and ep_md.exists():
                 result["fingerprint"] = _fingerprint(ep_audio, ep_md)
                 result["audit_status"] = "REPROCESSED"
                 result["selected_for_reprocess"] = False
                 result["needs_reprocess"] = False
+            elif result["reprocess_attempts"] >= MAX_REPROCESS_ATTEMPTS:
+                result["audit_status"] = "REPROCESS_FAILED"
+                result["selected_for_reprocess"] = False
             logger.info("Reprocessed %s: %s", episode.title, record.status)
         except Exception as exc:
             result["reprocess_status"] = "ERROR"
             result["reprocess_error"] = str(exc)
+            if result["reprocess_attempts"] >= MAX_REPROCESS_ATTEMPTS:
+                result["audit_status"] = "REPROCESS_FAILED"
+                result["selected_for_reprocess"] = False
             logger.error("Reprocessing failed for %s: %s", episode.title, exc)
         state["episodes"][episode.guid] = result
         _save_state(state)
@@ -181,7 +213,7 @@ def print_summary(audits: list[dict[str, Any]], reprocessed: list[dict[str, Any]
     errors = [r for r in audits if r.get("audit_status") != "AUDITED"]
     selected = [r for r in audited if r.get("selected_for_reprocess")]
     print("\n" + "=" * 110)
-    print("GEMINI 3.7 FLASH PROSODY AUDIT SUMMARY")
+    print("GEMINI PROSODY AUDIT SUMMARY")
     print("=" * 110)
     print(f"Audited: {len(audited)} | Audit errors: {len(errors)} | Selected for reprocessing: {len(selected)} | Reprocessed: {len(reprocessed)}")
     print("-" * 110)

@@ -186,12 +186,15 @@ class NotebookLMSync:
         seen: Dict[str, dict] = {}
         duplicates: List[dict] = []
 
-        for s in sources:
-            n_title = normalize_title(s.get("title", ""))
-            if n_title in seen:
-                duplicates.append(s)
+        for source in sources:
+            normalized_title = normalize_title(source.get("title", ""))
+            if not normalized_title:
+                logger.warning("Skipping untitled NotebookLM source during duplicate cleanup.")
+                continue
+            if normalized_title in seen:
+                duplicates.append(source)
             else:
-                seen[n_title] = s
+                seen[normalized_title] = source
 
         deleted_count = 0
         for dup in duplicates:
@@ -199,7 +202,11 @@ class NotebookLMSync:
             title = dup.get("title")
             logger.info(f"Deleting duplicate source in NotebookLM: {sid} ({title})...")
             del_cmd = ["notebooklm", "source", "delete", sid, "-y", "-n", self.notebook_id]
-            res = subprocess.run(del_cmd, capture_output=True, text=True, timeout=30)
+            try:
+                res = subprocess.run(del_cmd, capture_output=True, text=True, timeout=30)
+            except subprocess.SubprocessError as delete_error:
+                logger.warning(f"Failed deleting duplicate {sid}: {delete_error}")
+                continue
             if res.returncode == 0:
                 deleted_count += 1
             else:

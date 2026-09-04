@@ -39,9 +39,14 @@ class SermonBoundary:
     first_words: str
     last_words: str
     reasoning: str
+    is_fallback: bool = False
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+class BoundaryContentError(ValueError):
+    """The model responded, but its proposed boundaries are unusable."""
+
 
 
 def parse_timestamp_to_seconds(ts: str) -> float:
@@ -154,6 +159,7 @@ Return strict JSON:
   "reasoning": "<explanation of the selected start and end points>"
 }}"""
 
+        content_rejected = False
         for client in self.clients:
             for model_name in ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-3.7-flash", "gemini-3.6-flash", "gemini-3.5-flash"]:
                 try:
@@ -180,10 +186,13 @@ Return strict JSON:
                     if total_duration_sec > 0:
                         if end_sec <= start_sec or end_sec > total_duration_sec + 30:
                             end_sec = total_duration_sec
-                        # Reject implausibly short sermon spans (e.g. < 10 mins on a normal service)
-                        if total_duration_sec >= 1800 and (end_sec - start_sec < 600):
-                            raise ValueError(
-                                f"Implausible sermon span {format_seconds_to_timestamp(start_sec)} -> "
+                        # Reject a boundary-detection failure that effectively
+                        # returns 00:00:00 -> full duration. Legitimately short
+                        # sermons remain valid and are surfaced by QA instead.
+                        span = end_sec - start_sec
+                        if start_sec < 30 and span > total_duration_sec * 0.95:
+                            raise BoundaryContentError(
+                                f"Implausible full-service span {format_seconds_to_timestamp(start_sec)} -> "
                                 f"{format_seconds_to_timestamp(end_sec)} for a {format_seconds_to_timestamp(total_duration_sec)} service"
                             )
 
@@ -202,8 +211,14 @@ Return strict JSON:
                         f"by {boundary.speaker_name}"
                     )
                     return boundary
+                except BoundaryContentError as e:
+                    logger.warning(f"Rejected sermon boundaries from {model_name}: {e}")
+                    content_rejected = True
+                    break
                 except Exception as e:
                     logger.warning(f"Error detecting sermon boundaries with {model_name}: {e}")
+            if content_rejected:
+                break
 
         # Fallback based on reasonable church service liturgy
         fallback_start = total_duration_sec * 0.35 if total_duration_sec > 0 else 1800.0
@@ -217,6 +232,7 @@ Return strict JSON:
             first_words="N/A",
             last_words="N/A",
             reasoning="Fallback estimate based on audio length.",
+            is_fallback=True,
         )
 
     def extract_preaching_audio(
