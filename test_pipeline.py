@@ -7,6 +7,8 @@ from types import SimpleNamespace
 import pytest
 
 import downloader as downloader_module
+import dashboard_server as dashboard_module
+import drive_sync as drive_sync_module
 import pipeline as pipeline_module
 from downloader import sanitize_filename
 from pipeline import PodcastPipeline
@@ -41,6 +43,72 @@ def test_fetch_episodes_preserves_url_resolved_guid(tmp_path, monkeypatch):
     episodes = downloader_module.fetch_episodes("https://example.com/xml/feed.xml", max_retries=1)
     assert episodes[0].guid == "https://example.com/xml/1234"
 
+
+
+def test_dashboard_feed_cache_is_atomic_and_reused(tmp_path, monkeypatch):
+    cache_path = tmp_path / "feed_cache.json"
+    monkeypatch.setattr(dashboard_module, "FEED_CACHE_FILE", cache_path)
+    calls = 0
+
+    class CachedEpisode:
+        def to_dict(self):
+            return {"guid": "g", "title": "Episode"}
+
+    def fetch(_):
+        nonlocal calls
+        calls += 1
+        return [CachedEpisode()]
+
+    monkeypatch.setattr(downloader_module, "fetch_episodes", fetch)
+    assert dashboard_module._get_feed_entries_locked() == [{"guid": "g", "title": "Episode"}]
+    assert json.loads(cache_path.read_text(encoding="utf-8"))[0]["guid"] == "g"
+    assert not list(tmp_path.glob("*.tmp"))
+
+    monkeypatch.setattr(downloader_module, "fetch_episodes", lambda _: pytest.fail("fresh cache was ignored"))
+    assert dashboard_module._get_feed_entries_locked()[0]["guid"] == "g"
+    assert calls == 1
+
+
+def test_dashboard_chunk_progress_uses_created_chunk_count(tmp_path, monkeypatch):
+    monkeypatch.setattr(dashboard_module, "AUDIO_DIR", tmp_path)
+    monkeypatch.setattr(dashboard_module, "TRIMMED_DIR", tmp_path / "TrimmedAudio")
+    cache_dir = tmp_path / ".chunk_cache_Episode_480s"
+    cache_dir.mkdir()
+    for index in range(3):
+        (cache_dir / f"chunk_{index:03d}.mp3").write_bytes(b"audio")
+    (cache_dir / "chunk_000.txt").write_text("complete transcript", encoding="utf-8")
+    (tmp_path / "Episode.mp3").write_bytes(b"small")
+
+    active = dashboard_module.detect_current_active_stage()
+    assert active["stage"] == "TRANSCRIBING"
+    assert active["chunks_done"] == 1
+    assert active["chunks_total"] == 3
+
+
+def test_drive_mirror_skips_identical_file_copy(tmp_path, monkeypatch):
+    source = tmp_path / "episode.md"
+    source.write_text("transcript", encoding="utf-8")
+    drive_root = tmp_path / "Drive"
+    destination_dir = drive_root / "Transcripts"
+    destination_dir.mkdir(parents=True)
+    destination = destination_dir / source.name
+    drive_sync_module.shutil.copy2(source, destination)
+
+    uploader = drive_sync_module.DriveUploader.__new__(drive_sync_module.DriveUploader)
+    uploader.local_drive_path = drive_root
+    uploader.transcripts_folder_id = "transcripts"
+    uploader.trimmed_audio_folder_id = "audio"
+    uploader.folder_id = "root"
+    uploader._api_authenticated = False
+    uploader.service = None
+    monkeypatch.setattr(
+        drive_sync_module.shutil,
+        "copy2",
+        lambda *_: pytest.fail("identical mirror file was copied"),
+    )
+
+    result = uploader.upload_file(source)
+    assert result["local_drive_dest"] == str(destination)
 
 def test_timestamp_conversions():
     assert parse_timestamp_to_seconds("01:23:45") == 5025.0

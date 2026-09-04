@@ -548,24 +548,58 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       font-size: 20px; cursor: pointer; padding: 4px 8px;
     }
     .modal-close:hover { color: var(--text); }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .btn:focus-visible, .tab:focus-visible, .search-box:focus-visible, .modal-close:focus-visible {
+      outline: 3px solid #93c5fd; outline-offset: 2px;
+    }
+    .badge.error { color: #fecaca; border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.12); }
+    .active-card.idle { border-color: var(--card-border); }
+    .active-card.idle::before { background: var(--text-muted); }
+    .refresh-state { min-height: 18px; margin-top: 8px; color: var(--text-muted); font-size: 11px; text-align: right; }
+    table { min-width: 900px; }
+
+    @media (max-width: 760px) {
+      body { padding: 14px; }
+      header { align-items: flex-start; flex-direction: column; gap: 16px; }
+      .header-actions { width: 100%; flex-wrap: wrap; }
+      .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .section-header > div:last-child, .filter-tabs, .search-box { width: 100%; }
+      .filter-tabs { overflow-x: auto; padding-bottom: 4px; }
+      .tab { flex: 0 0 auto; }
+      .search-box { min-width: 0; }
+      .modal-overlay { padding: 10px; }
+      .modal-header, .modal-body { padding: 16px; }
+    }
+    @media (max-width: 460px) {
+      .metrics-grid, .stepper { grid-template-columns: 1fr; }
+      .card, .active-card { padding: 16px; }
+      .brand h1 { font-size: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="brand">
-        <div class="brand-icon">🎙️</div>
+        <div class="brand-icon" aria-hidden="true">🎙️</div>
         <div>
           <h1>Christ Chapel Podcast Pipeline</h1>
           <p>Autonomous Audio Extraction, Prosody Transcription & Drive Sync</p>
         </div>
       </div>
       <div class="header-actions">
-        <div class="badge active" id="processBadge">
-          <div class="pulse-dot"></div>
-          <span id="processStatusText">Pipeline Active</span>
+        <div class="badge" id="processBadge" role="status" aria-live="polite">
+          <div class="pulse-dot" aria-hidden="true"></div>
+          <span id="processStatusText">Connecting…</span>
         </div>
-        <a href="https://drive.google.com/drive/folders/1emYUaJPU0_5qoGgNphNW51A12wwrUWhz" target="_blank" class="btn btn-primary">
+        <a href="https://drive.google.com/drive/folders/1emYUaJPU0_5qoGgNphNW51A12wwrUWhz" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
           📂 Google Drive
         </a>
       </div>
@@ -576,7 +610,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <div class="card">
         <div class="metric-title">Overall Progress</div>
         <div class="metric-value"><span id="processedCount">0</span> <span style="font-size: 16px; color: var(--text-muted); font-weight: 500;">/ <span id="totalCount">720</span></span></div>
-        <div class="progress-track"><div class="progress-fill" id="overallProgressBar"></div></div>
+        <div class="progress-track" id="overallProgressTrack" role="progressbar" aria-label="Overall catalog progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="overallProgressBar"></div></div>
         <div class="metric-sub" id="percentText">0% Cataloged</div>
       </div>
       <div class="card">
@@ -585,9 +619,9 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div class="metric-sub">Isolated sermon cuts</div>
       </div>
       <div class="card">
-        <div class="metric-title">Drive Sync Status</div>
-        <div class="metric-value" style="font-size: 20px; color: var(--success);">Synced</div>
-        <div class="metric-sub">Local CloudStorage Active</div>
+        <div class="metric-title">Drive Mirror</div>
+        <div class="metric-value" style="font-size: 20px;">Configured</div>
+        <div class="metric-sub">Availability checked during each sync</div>
       </div>
       <div class="card">
         <div class="metric-title">Storage Processed</div>
@@ -597,7 +631,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     </div>
 
     <!-- Active Spotlight -->
-    <div class="active-card" id="activeCard">
+    <div class="active-card idle" id="activeCard" role="status" aria-live="polite">
       <div class="active-header">
         <div>
           <div class="active-tag" id="activeTag">
@@ -645,18 +679,21 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <div class="section-header">
       <div class="section-title">Episode Catalog & Processing Queue</div>
       <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <div class="filter-tabs">
-          <button class="tab active" onclick="setFilter('ALL')">All (<span id="tabCountAll">0</span>)</button>
-          <button class="tab" onclick="setFilter('COMPLETED')">Completed (<span id="tabCountDone">0</span>)</button>
-          <button class="tab" onclick="setFilter('IN_PROGRESS')">Active (<span id="tabCountActive">0</span>)</button>
-          <button class="tab" onclick="setFilter('QUEUED')">Queued (<span id="tabCountQueued">0</span>)</button>
+        <div class="filter-tabs" role="group" aria-label="Filter episodes by status">
+          <button type="button" class="tab active" aria-pressed="true" onclick="setFilter('ALL', this)">All (<span id="tabCountAll">0</span>)</button>
+          <button type="button" class="tab" aria-pressed="false" onclick="setFilter('COMPLETED', this)">Completed (<span id="tabCountDone">0</span>)</button>
+          <button type="button" class="tab" aria-pressed="false" onclick="setFilter('IN_PROGRESS', this)">Active (<span id="tabCountActive">0</span>)</button>
+          <button type="button" class="tab" aria-pressed="false" onclick="setFilter('QUEUED', this)">Queued (<span id="tabCountQueued">0</span>)</button>
         </div>
-        <input type="text" class="search-box" id="searchInput" placeholder="Search by title, date, speaker..." oninput="renderTable()">
+        <label for="searchInput" class="sr-only">Search episodes by title, date, or speaker</label>
+        <input type="search" class="search-box" id="searchInput" placeholder="Search title, date, or speaker" autocomplete="off" oninput="renderTable()">
       </div>
+      <div class="refresh-state" id="refreshState" role="status" aria-live="polite">Connecting to dashboard…</div>
     </div>
 
     <div class="table-container">
       <table>
+        <caption class="sr-only">Podcast episodes and processing status</caption>
         <thead>
           <tr>
             <th style="width: 50px;">#</th>
@@ -668,35 +705,54 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             <th style="width: 140px;">Actions</th>
           </tr>
         </thead>
-        <tbody id="episodesTableBody">
-          <tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">Loading episodes catalog...</td></tr>
+        <tbody id="episodesTableBody" aria-live="polite">
+          <tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">Loading episode catalog…</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- Transcript Modal -->
-  <div class="modal-overlay" id="transcriptModal">
-    <div class="modal">
+  <div class="modal-overlay" id="transcriptModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1">
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Transcript Preview</div>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button type="button" class="modal-close" id="modalClose" aria-label="Close transcript preview" onclick="closeModal()">&times;</button>
       </div>
-      <div class="modal-body" id="modalBody">Loading...</div>
+      <div class="modal-body" id="modalBody">Loading…</div>
     </div>
   </div>
 
   <script>
     let allEpisodes = [];
     let currentFilter = 'ALL';
+    let refreshInFlight = false;
+    let lastFocusedElement = null;
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[character]);
+    }
 
     async function fetchStatus() {
+      if (refreshInFlight) return;
+      refreshInFlight = true;
+      const refreshState = document.getElementById('refreshState');
       try {
-        const res = await fetch('/api/status');
+        const res = await fetch('/api/status', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         updateDashboard(data);
+        refreshState.textContent = `Updated ${new Date().toLocaleTimeString()}`;
       } catch (err) {
         console.error('Failed to fetch status:', err);
+        refreshState.textContent = `Dashboard update failed: ${err.message}. Retrying automatically.`;
+        const badge = document.getElementById('processBadge');
+        badge.className = 'badge error';
+        document.getElementById('processStatusText').textContent = 'Connection problem';
+      } finally {
+        refreshInFlight = false;
       }
     }
 
@@ -705,6 +761,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       document.getElementById('totalCount').textContent = data.total_episodes;
       document.getElementById('percentText').textContent = `${data.percent_complete}% Cataloged`;
       document.getElementById('overallProgressBar').style.width = `${data.percent_complete}%`;
+      document.getElementById('overallProgressTrack').setAttribute('aria-valuenow', data.percent_complete);
       document.getElementById('preachingTime').textContent = data.total_preaching_time;
 
       if (data.storage) {
@@ -713,41 +770,52 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         document.getElementById('storageTrim').textContent = data.storage.trimmed_mb;
       }
 
-      // Active Job Card
       const act = data.active_job;
+      const activeCard = document.getElementById('activeCard');
+      const processBadge = document.getElementById('processBadge');
+      const processText = document.getElementById('processStatusText');
+      const steps = [
+        document.getElementById('step1'),
+        document.getElementById('step2'),
+        document.getElementById('step3'),
+        document.getElementById('step4')
+      ];
+      steps.forEach(step => {
+        step.className = 'step';
+        step.removeAttribute('aria-current');
+      });
+
       if (act && act.is_active) {
-        document.getElementById('activeCard').style.display = 'block';
+        activeCard.classList.remove('idle');
+        processBadge.className = 'badge active';
+        processText.textContent = 'File operation active';
         document.getElementById('activeStageName').textContent = act.stage_label;
-        document.getElementById('activeTitle').textContent = act.episode_title || 'Active Episode';
-        document.getElementById('activeDetails').textContent = act.details || '';
+        document.getElementById('activeTitle').textContent = act.episode_title || 'Active episode';
+        document.getElementById('activeDetails').textContent = act.details || 'Processing';
 
-        // Stepper updates
-        const s1 = document.getElementById('step1');
-        const s2 = document.getElementById('step2');
-        const s3 = document.getElementById('step3');
-        const s4 = document.getElementById('step4');
-
-        [s1, s2, s3, s4].forEach(s => { s.className = 'step'; });
-
-        if (act.stage === 'DOWNLOADING') {
-          s1.className = 'step active';
-        } else if (act.stage === 'TRANSCRIBING') {
-          s1.className = 'step done';
-          s2.className = 'step active';
-        } else if (act.stage === 'TRIMMING') {
-          s1.className = 'step done';
-          s2.className = 'step done';
-          s3.className = 'step active';
-        } else if (act.stage === 'SYNCING') {
-          s1.className = 'step done';
-          s2.className = 'step done';
-          s3.className = 'step done';
-          s4.className = 'step active';
+        const stageIndex = {
+          DOWNLOADING: 0,
+          TRANSCRIBING: 1,
+          TRIMMING: 2,
+          SYNCING: 3
+        }[act.stage];
+        if (stageIndex !== undefined) {
+          steps.forEach((step, index) => {
+            if (index < stageIndex) step.className = 'step done';
+            if (index === stageIndex) {
+              step.className = 'step active';
+              step.setAttribute('aria-current', 'step');
+            }
+          });
         }
       } else {
-        document.getElementById('activeStageName').textContent = 'Pipeline Active';
-        document.getElementById('activeTitle').textContent = 'Processing in Progress';
-        document.getElementById('activeDetails').textContent = 'Waiting on next active cycle...';
+        activeCard.classList.add('idle');
+        processBadge.className = 'badge';
+        processText.textContent = 'No active file operation';
+        document.getElementById('activeStageName').textContent = 'Idle';
+        document.getElementById('activeTitle').textContent = 'No file operation detected';
+        document.getElementById('activeDetails').textContent =
+          'The backfill may be scanning completed episodes between observable stages.';
       }
 
       allEpisodes = data.episodes || [];
@@ -756,92 +824,123 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     }
 
     function updateTabCounts() {
-      const done = allEpisodes.filter(e => e.status === 'COMPLETED').length;
-      const active = allEpisodes.filter(e => e.status === 'IN_PROGRESS').length;
-      const queued = allEpisodes.filter(e => e.status === 'QUEUED').length;
-
+      const done = allEpisodes.filter(episode => episode.status === 'COMPLETED').length;
+      const active = allEpisodes.filter(episode => episode.status === 'IN_PROGRESS').length;
+      const queued = allEpisodes.filter(episode => episode.status === 'QUEUED').length;
       document.getElementById('tabCountAll').textContent = allEpisodes.length;
       document.getElementById('tabCountDone').textContent = done;
       document.getElementById('tabCountActive').textContent = active;
       document.getElementById('tabCountQueued').textContent = queued;
     }
 
-    function setFilter(filter) {
+    function setFilter(filter, button) {
       currentFilter = filter;
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      document.querySelectorAll('.tab').forEach(tab => {
+        const selected = tab === button;
+        tab.classList.toggle('active', selected);
+        tab.setAttribute('aria-pressed', String(selected));
+      });
       renderTable();
     }
 
     function renderTable() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const tbody = document.getElementById('episodesTableBody');
-
-      const filtered = allEpisodes.filter(ep => {
-        if (currentFilter !== 'ALL' && ep.status !== currentFilter) return false;
-        if (query) {
-          const matchTitle = (ep.title || '').toLowerCase().includes(query);
-          const matchDate = (ep.date || '').toLowerCase().includes(query);
-          const matchAuthor = (ep.author || '').toLowerCase().includes(query);
-          return matchTitle || matchDate || matchAuthor;
-        }
-        return true;
+      const filtered = allEpisodes.filter(episode => {
+        if (currentFilter !== 'ALL' && episode.status !== currentFilter) return false;
+        if (!query) return true;
+        return [episode.title, episode.date, episode.author]
+          .some(value => String(value || '').toLowerCase().includes(query));
       });
 
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">No matching episodes found.</td></tr>';
+        const message = allEpisodes.length
+          ? 'No episodes match the current search and filter.'
+          : 'No episodes are available yet.';
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">${message}</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = filtered.map(ep => {
-        const cut = (ep.preaching_start && ep.preaching_end) 
-          ? `<span class="mono" style="color: #60a5fa;">${ep.preaching_start} → ${ep.preaching_end}</span>`
-          : '<span style="color: var(--text-muted); font-size: 12px;">Full Service</span>';
-
-        const viewBtn = ep.md_file 
-          ? `<button class="btn" style="padding: 4px 8px; font-size: 11px;" onclick="viewTranscript('${encodeURIComponent(ep.md_file)}', '${encodeURIComponent(ep.title)}')">📄 Read</button>`
+      const statusLabels = {
+        COMPLETED: 'Complete',
+        IN_PROGRESS: 'In progress',
+        QUEUED: 'Queued',
+        FAILED: 'Failed'
+      };
+      tbody.innerHTML = filtered.map(episode => {
+        const status = Object.hasOwn(statusLabels, episode.status) ? episode.status : 'QUEUED';
+        const cut = episode.preaching_start && episode.preaching_end
+          ? `<span class="mono" style="color: #93c5fd;">${escapeHtml(episode.preaching_start)} → ${escapeHtml(episode.preaching_end)}</span>`
+          : '<span style="color: var(--text-muted); font-size: 12px;">Not extracted</span>';
+        const viewButton = episode.md_file
+          ? `<button type="button" class="btn read-transcript" style="padding: 4px 8px; font-size: 11px;" data-file="${escapeHtml(encodeURIComponent(episode.md_file))}" data-title="${escapeHtml(encodeURIComponent(episode.title || 'Transcript'))}">Read transcript</button>`
+          : '<span style="color: var(--text-muted); font-size: 12px;">No transcript</span>';
+        const driveLink = episode.drive_link
+          ? `<a href="${escapeHtml(episode.drive_link)}" target="_blank" rel="noopener noreferrer" class="btn" style="padding: 4px 8px; font-size: 11px;">Open Drive</a>`
           : '';
 
         return `
           <tr>
-            <td class="mono" style="color: var(--text-muted);">${ep.index}</td>
-            <td class="mono" style="font-weight: 600;">${ep.date}</td>
-            <td style="font-weight: 600;">${ep.title}</td>
-            <td style="color: var(--text-muted);">${ep.author || 'John C. Wood'}</td>
+            <td class="mono" style="color: var(--text-muted);">${escapeHtml(episode.index)}</td>
+            <td class="mono" style="font-weight: 600;">${escapeHtml(episode.date)}</td>
+            <td style="font-weight: 600;">${escapeHtml(episode.title)}</td>
+            <td style="color: var(--text-muted);">${escapeHtml(episode.author || 'Unknown')}</td>
             <td>${cut}</td>
-            <td><span class="status-badge ${ep.status}">${ep.status}</span></td>
-            <td>
-              <div style="display: flex; gap: 6px;">
-                ${viewBtn}
-                <a href="${ep.drive_link}" target="_blank" class="btn" style="padding: 4px 8px; font-size: 11px;">📂 Drive</a>
-              </div>
-            </td>
-          </tr>
-        `;
+            <td><span class="status-badge ${status}">${statusLabels[status]}</span></td>
+            <td><div style="display: flex; gap: 6px; flex-wrap: wrap;">${viewButton}${driveLink}</div></td>
+          </tr>`;
       }).join('');
+
+      tbody.querySelectorAll('.read-transcript').forEach(button => {
+        button.addEventListener('click', () => viewTranscript(button.dataset.file, button.dataset.title));
+      });
     }
 
     async function viewTranscript(mdFile, title) {
       const modal = document.getElementById('transcriptModal');
+      lastFocusedElement = document.activeElement;
       document.getElementById('modalTitle').textContent = decodeURIComponent(title);
-      document.getElementById('modalBody').textContent = 'Loading transcript...';
+      document.getElementById('modalBody').textContent = 'Loading transcript…';
       modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('modalClose').focus();
 
       try {
-        const res = await fetch(`/api/transcript?file=${mdFile}`);
-        const text = await res.text();
-        document.getElementById('modalBody').textContent = text;
+        const res = await fetch(`/api/transcript?file=${mdFile}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        document.getElementById('modalBody').textContent = await res.text();
       } catch (err) {
-        document.getElementById('modalBody').textContent = 'Failed to load transcript: ' + err;
+        document.getElementById('modalBody').textContent =
+          `Transcript could not be loaded (${err.message}). Close this dialog and try again.`;
       }
     }
 
     function closeModal() {
-      document.getElementById('transcriptModal').style.display = 'none';
+      const modal = document.getElementById('transcriptModal');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (lastFocusedElement) lastFocusedElement.focus();
     }
 
-    // Auto-refresh polling every 3 seconds
-    setInterval(fetchStatus, 3000);
+    document.getElementById('transcriptModal').addEventListener('click', event => {
+      if (event.target.id === 'transcriptModal') closeModal();
+    });
+    document.addEventListener('keydown', event => {
+      const modalOpen = document.getElementById('transcriptModal').getAttribute('aria-hidden') === 'false';
+      if (event.key === 'Escape' && modalOpen) closeModal();
+      if (event.key === 'Tab' && modalOpen) {
+        event.preventDefault();
+        document.getElementById('modalClose').focus();
+      }
+    });
+    setInterval(() => {
+      if (!document.hidden) fetchStatus();
+    }, 5000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) fetchStatus();
+    });
     fetchStatus();
   </script>
 </body>
