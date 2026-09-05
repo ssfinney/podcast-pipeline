@@ -80,7 +80,7 @@ def audit_and_reprocess(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Audit eligible completed episodes, then reprocess only high-confidence failures."""
     episodes = fetch_episodes(feed_url)
-    pipeline = PodcastPipeline(model_name="gemini-3.7-flash")
+    pipeline = PodcastPipeline(model_name="gemini-3.7-flash", transcription_backend="gemini")
     # Bound stalled model requests; a 4-minute request is enough for an audit
     # response while still allowing the ordered fallback to proceed.
     pipeline.transcriber.client = genai.Client(

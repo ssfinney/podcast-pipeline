@@ -5,6 +5,7 @@ import pytest
 from downloader import sanitize_filename, parse_pub_date, Episode
 from trimmer import parse_timestamp_to_seconds, format_seconds_to_timestamp
 from transcriber import ProsodyTranscriber, adjust_chunk_timestamps
+from local_transcriber import WordProsody, render_prosody_words
 from validator import detect_repetition_loops, PodcastValidator
 
 
@@ -26,6 +27,30 @@ def test_adjust_chunk_timestamps():
     chunk_text = "### Speaker [00:03:14] Welcome to church."
     adjusted = adjust_chunk_timestamps(chunk_text, start_sec=1800)  # 30 mins offset
     assert "[00:33:14]" in adjusted
+
+
+def test_local_prosody_renderer_uses_measured_features():
+    words = [
+        WordProsody("we", 0.0, 0.2, -25.0, 120.0, 121.0),
+        WordProsody("believe", 0.25, 0.75, -24.0, 120.0, 122.0),
+        WordProsody("grace", 1.6, 2.2, -12.0, 120.0, 155.0),
+        WordProsody(".", 2.2, 2.25, -25.0, None, None),
+    ]
+    rendered = render_prosody_words(words)
+    assert "### Speaker [00:00:00]" in rendered
+    assert "[pause: 0.9s]" in rendered
+    assert "[rising pitch]" in rendered
+    assert "**grace**" in rendered
+
+
+def test_local_prosody_renderer_marks_speaker_changes():
+    words = [
+        WordProsody("Welcome", 0.0, 0.4, -20.0, 120.0, 120.0, "SPEAKER_00"),
+        WordProsody("Amen", 1.0, 1.4, -20.0, 180.0, 180.0, "SPEAKER_01"),
+    ]
+    rendered = render_prosody_words(words)
+    assert "### SPEAKER_00 [00:00:00]" in rendered
+    assert "### SPEAKER_01 [00:00:01]" in rendered
 
 
 def test_repetition_detector():

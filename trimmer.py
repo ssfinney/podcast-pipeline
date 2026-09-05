@@ -110,9 +110,7 @@ class PreachingTrimmer:
 
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
-            raise ValueError("GEMINI_API_KEY is not set.")
-        self.client = genai.Client(api_key=self.api_key)
+        self.client = genai.Client(api_key=self.api_key) if self.api_key else None
 
     def detect_boundaries_from_transcript(
         self,
@@ -123,6 +121,9 @@ class PreachingTrimmer:
         Analyze transcript with Gemini to identify the start and end of the preaching message.
         """
         optimized_transcript = clean_text_for_boundary_detection(transcript_text)
+
+        if self.client is None:
+            raise RuntimeError("GEMINI_API_KEY is required for sermon boundary detection.")
 
         prompt = f"""You are an expert audio editor analyzing a Christian church service / podcast transcript.
 Identify the exact START timestamp and END timestamp where the MAIN PREACHING / SERMON message begins and ends.
