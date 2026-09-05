@@ -47,6 +47,8 @@ TrimmedAudio/*.tmp*
 *.tmp
 *.tmp.*
 .chunk_cache_*
+.local_chunk_cache_*
+ProsodyPOC/
 
 # Generated Transcripts & Local Cache
 ProcessedMD/*.md

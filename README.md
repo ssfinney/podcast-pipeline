@@ -86,6 +86,34 @@ GEMINI_MODEL=gemini-3.1-flash-lite
 GOOGLE_DRIVE_FOLDER_ID=your_drive_folder_id
 ```
 
+### Free local transcription and prosody
+
+The Gemini backend remains the default. To run transcription and acoustic
+prosody analysis without an API quota:
+
+```bash
+uv sync --extra local-prosody
+uv run python pipeline.py --backend local --local-model small.en --limit 1
+```
+
+The local backend uses faster-whisper word timestamps plus measured pitch,
+intensity, duration, and silence. `small.en` with CPU INT8 is the conservative
+default for Intel Macs. Use `--local-model turbo` on faster hardware.
+
+Optional speaker diarization uses the free pyannote Community-1 model. Accept
+its Hugging Face model terms, set `HF_TOKEN`, and enable it with
+`LOCAL_DIARIZATION=true`. Install it separately with
+`uv sync --extra local-prosody --extra diarization`.
+
+To create three non-destructive previews beside the existing Gemini outputs:
+
+```bash
+uv run python prosody_compare.py --limit 3
+```
+
+Previews and `report.json` are written under `ProsodyPOC/`; the manifest,
+Drive files, and existing transcripts are not modified.
+
 ---
 
 ## 🛠️ Usage

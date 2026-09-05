@@ -26,6 +26,7 @@ from downloader import (
     fetch_episodes,
 )
 from drive_sync import DriveUploader
+from local_transcriber import LocalProsodyTranscriber
 from notebooklm_sync import NotebookLMSync
 from transcriber import ProsodyTranscriber
 from trimmer import DEFAULT_TRIMMED_DIR, PreachingTrimmer, SermonBoundary, get_audio_duration
@@ -65,6 +66,8 @@ class ProcessingRecord:
     drive_file_id: Optional[str] = None
     drive_link: Optional[str] = None
     transcription_time_s: Optional[float] = None
+    transcription_backend: Optional[str] = None
+    transcription_model: Optional[str] = None
     completed_at: Optional[str] = None
 
     def to_dict(self) -> dict:
@@ -83,13 +86,21 @@ class PodcastPipeline:
         model_name: Optional[str] = None,
         drive_folder_id: Optional[str] = None,
         notebook_id: Optional[str] = None,
+        transcription_backend: Optional[str] = None,
+        local_model: Optional[str] = None,
     ):
         self.feed_url = feed_url
         self.audio_dir = audio_dir
         self.processed_dir = processed_dir
         self.trimmed_dir = trimmed_dir
         self.drive_uploader = DriveUploader(folder_id=drive_folder_id)
-        self.transcriber = ProsodyTranscriber(preferred_model=model_name)
+        backend = (transcription_backend or os.getenv("TRANSCRIPTION_BACKEND", "gemini")).lower()
+        if backend == "local":
+            self.transcriber = LocalProsodyTranscriber(model_name=local_model)
+        elif backend == "gemini":
+            self.transcriber = ProsodyTranscriber(preferred_model=model_name)
+        else:
+            raise ValueError("TRANSCRIPTION_BACKEND must be 'gemini' or 'local'.")
         self.trimmer = PreachingTrimmer()
         self.notebooklm_syncer = NotebookLMSync(notebook_id=notebook_id)
         self.manifest: Dict[str, dict] = self._load_manifest()
@@ -281,7 +292,7 @@ class PodcastPipeline:
             self._save_manifest()
             return record
 
-        # Step 2: Prosody Transcription via Gemini
+        # Step 2: Prosody transcription through the selected backend
         t0 = time.time()
         md_path = md_dest
         try:
@@ -388,6 +399,8 @@ class PodcastPipeline:
             drive_file_id=drive_file_id,
             drive_link=drive_link,
             transcription_time_s=transcription_time,
+            transcription_backend=getattr(self.transcriber, "backend", None),
+            transcription_model=self.transcriber.last_model_used,
             completed_at=time.strftime("%Y-%m-%d %H:%M:%S"),
         )
         self.manifest[episode.guid] = record.to_dict()
@@ -495,6 +508,8 @@ def main():
     parser.add_argument("--limit", type=int, default=0, help="Number of episodes to process (0 = all)")
     parser.add_argument("--force", action="store_true", help="Force re-processing of already completed items")
     parser.add_argument("--model", default=None, help="Preferred Gemini model name")
+    parser.add_argument("--backend", choices=["gemini", "local"], default=None, help="Transcription backend")
+    parser.add_argument("--local-model", default=None, help="faster-whisper model (default: small.en)")
     parser.add_argument("--drive-folder", default=None, help="Google Drive folder ID")
     parser.add_argument("--notebook-id", default=None, help="Target NotebookLM notebook ID")
 
@@ -505,6 +520,8 @@ def main():
         model_name=args.model,
         drive_folder_id=args.drive_folder,
         notebook_id=args.notebook_id,
+        transcription_backend=args.backend,
+        local_model=args.local_model,
     )
 
     pipeline.run_pipeline(

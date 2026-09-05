@@ -22,6 +22,14 @@ dependencies = [
     "yt-dlp>=2026.8.19",
 ]
 
+[project.optional-dependencies]
+local-prosody = [
+    "faster-whisper>=1.2.1",
+    "librosa>=0.11.0",
+    "numpy>=2.0.0",
+]
+diarization = ["pyannote.audio>=4.0.0"]
+
 [project.scripts]
 podcast-pipeline = "podcast_pipeline:main"
 

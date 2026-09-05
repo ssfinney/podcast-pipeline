@@ -111,6 +111,7 @@ class ProsodyTranscriber:
     """Manages audio upload, Gemini prosody transcription, parallel chunking, caching, and file cleanup."""
 
     def __init__(self, api_key: Optional[str] = None, preferred_model: Optional[str] = None):
+        self.backend = "gemini"
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is not set. Please set it in your environment or .env file.")
@@ -435,6 +436,8 @@ duration: "{episode.duration}"
 media_url: "{episode.media_url}"
 audio_file: "{audio_path.name}"
 guid: "{episode.guid}"
+transcription_backend: "{self.backend}"
+transcription_model: "{self.last_model_used or self.preferred_model}"
 ---
 
 # {episode.title}
